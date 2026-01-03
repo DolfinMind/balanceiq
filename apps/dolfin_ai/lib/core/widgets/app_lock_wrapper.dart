@@ -13,8 +13,7 @@ class AppLockWrapper extends StatefulWidget {
   State<AppLockWrapper> createState() => _AppLockWrapperState();
 }
 
-class _AppLockWrapperState extends State<AppLockWrapper>
-    with WidgetsBindingObserver {
+class _AppLockWrapperState extends State<AppLockWrapper> {
   bool _isLocked = false;
   bool _enabled = false;
   bool _isAuthenticating = false;
@@ -23,14 +22,7 @@ class _AppLockWrapperState extends State<AppLockWrapper>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _checkAppLockEnabled();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   Future<void> _checkAppLockEnabled() async {
@@ -57,16 +49,6 @@ class _AppLockWrapperState extends State<AppLockWrapper>
 
     if (authenticated && mounted) {
       setState(() => _isLocked = false);
-    }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed &&
-        _enabled &&
-        !_isAuthenticating &&
-        !_isLocked) {
-      _authenticate();
     }
   }
 
