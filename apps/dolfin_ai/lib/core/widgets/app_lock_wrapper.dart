@@ -1,4 +1,5 @@
 import 'package:dolfin_core/services/biometric_auth_service.dart';
+import 'package:dolfin_ui_kit/dolfin_ui_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -56,19 +57,53 @@ class _AppLockWrapperState extends State<AppLockWrapper> {
   Widget build(BuildContext context) {
     if (_isLocked) {
       return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.lock_outline, size: 64, color: Colors.blue),
-              const SizedBox(height: 16),
-              const Text('App Locked', style: TextStyle(fontSize: 24)),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _authenticate,
-                child: const Text('Unlock'),
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const AppLogo(size: 100),
+                const SizedBox(height: 32),
+                Text(
+                  'Dolfin AI Locked',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Dolfin AI is locked for your security.\nPlease unlock to continue.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
+                ),
+                const SizedBox(height: 48),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _authenticate,
+                    icon: const Icon(Icons.fingerprint),
+                    label: const Text('Unlock with Biometrics'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
