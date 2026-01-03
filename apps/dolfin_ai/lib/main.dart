@@ -14,6 +14,7 @@ import 'firebase_options.dart';
 
 import 'core/di/injection_container.dart' as di;
 import 'core/navigation/navigator_service.dart';
+import 'core/widgets/app_lock_wrapper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:dolfin_ui_kit/theme/app_theme.dart';
 import 'package:dolfin_ui_kit/theme/theme_cubit.dart';
@@ -178,6 +179,8 @@ class MyApp extends StatelessWidget {
               theme: AppTheme.lightTheme(),
               darkTheme: AppTheme.darkTheme(),
               themeMode: themeMode,
+              builder: (context, child) =>
+                  AppLockWrapper(child: child ?? const SizedBox()),
               home: const SplashPage(),
               routes: {
                 '/onboarding': (context) => const OnboardingPage(),
