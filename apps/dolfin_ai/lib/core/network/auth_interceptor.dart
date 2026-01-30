@@ -106,7 +106,8 @@ class AuthInterceptor extends Interceptor {
 
               // Update the stored tokens
               if (refreshResponse.data != null) {
-                await secureStorage.saveToken(refreshResponse.data!.token);
+                await secureStorage
+                    .saveToken(refreshResponse.data!.accessToken);
                 await secureStorage
                     .saveRefreshToken(refreshResponse.data!.refreshToken);
               }
@@ -116,7 +117,7 @@ class AuthInterceptor extends Interceptor {
               // Retry the original request with the new token
               final opts = err.requestOptions;
               opts.headers['Authorization'] =
-                  'Bearer ${refreshResponse.data!.token}';
+                  'Bearer ${refreshResponse.data!.accessToken}';
 
               AppLogger.debug(
                   '🔐 Retrying original request: ${opts.method} ${opts.path}',

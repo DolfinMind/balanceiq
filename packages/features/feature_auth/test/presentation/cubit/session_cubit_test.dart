@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dolfin_core/error/failures.dart';
 import 'package:dolfin_core/storage/secure_storage_service.dart';
@@ -8,52 +9,71 @@ import 'package:feature_auth/domain/usecases/update_currency.dart';
 import 'package:feature_auth/presentation/cubit/session/session_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../../mocks.dart';
 
 class MockSecureStorageService extends Mock implements SecureStorageService {}
+
+class MockCacheManager extends Mock implements BaseCacheManager {}
 
 class MockUpdateCurrency extends Mock implements UpdateCurrency {}
 
 class FakeUser extends Fake implements User {}
 
 void main() {
-  late SessionCubit sessionCubit;
-  late MockGetCurrentUser mockGetCurrentUser;
-  late MockSignOut mockSignOut;
-  late MockGetProfile mockGetProfile;
-  late MockSecureStorageService mockSecureStorage;
-  late MockUpdateCurrency mockUpdateCurrency;
-  late MockSaveUser mockSaveUser;
-  late MockUpdateProfile mockUpdateProfile;
+  TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
     registerFallbackValue(FakeUser());
   });
 
+  late SessionCubit cubit;
+  late MockGetCurrentUser mockGetCurrentUser;
+  late MockSignOut mockSignOut;
+  late MockGetProfile mockGetProfile;
+  late MockUpdateCurrency mockUpdateCurrency;
+  late MockUpdateProfile mockUpdateProfile;
+  late MockSaveUser mockSaveUser;
+  late MockCurrencyCubit mockCurrencyCubit;
+  late MockSecureStorageService mockSecureStorageService;
+  late MockCacheManager mockCacheManager;
+
   setUp(() {
     mockGetCurrentUser = MockGetCurrentUser();
     mockSignOut = MockSignOut();
     mockGetProfile = MockGetProfile();
-    mockSecureStorage = MockSecureStorageService();
     mockUpdateCurrency = MockUpdateCurrency();
-    mockSaveUser = MockSaveUser();
     mockUpdateProfile = MockUpdateProfile();
+    mockSaveUser = MockSaveUser();
+    mockCurrencyCubit = MockCurrencyCubit();
+    mockSecureStorageService = MockSecureStorageService();
+    mockCacheManager = MockCacheManager();
+    when(() => mockCacheManager.emptyCache()).thenAnswer((_) async {});
+    when(() => mockSecureStorageService.deleteAll()).thenAnswer((_) async {});
 
-    sessionCubit = SessionCubit(
+    final currencyState =
+        const CurrencyState(currencyCode: 'USD', currencySymbol: '\$');
+    when(() => mockCurrencyCubit.state).thenReturn(currencyState);
+    when(() => mockCurrencyCubit.stream)
+        .thenAnswer((_) => Stream.value(currencyState));
+    when(() => mockCurrencyCubit.reset()).thenAnswer((_) async {});
+
+    cubit = SessionCubit(
       getCurrentUser: mockGetCurrentUser,
       signOutUseCase: mockSignOut,
       getProfile: mockGetProfile,
       updateCurrencyUseCase: mockUpdateCurrency,
       updateProfileUseCase: mockUpdateProfile,
       saveUser: mockSaveUser,
-      secureStorage: mockSecureStorage,
-      currencyCubit: FakeCurrencyCubit(),
+      currencyCubit: mockCurrencyCubit,
+      secureStorage: mockSecureStorageService,
+      cacheManager: mockCacheManager,
     );
   });
 
   tearDown(() {
-    sessionCubit.close();
+    cubit.close();
   });
 
   group('SessionCubit', () {
@@ -68,17 +88,14 @@ void main() {
     );
 
     final testUserInfo = UserInfo(
-      id: 1,
-      username: 'testuser',
-      fullName: 'Test User',
+      id: '1',
       email: 'test@example.com',
-      photoUrl: null,
-      roles: ['USER'],
+      fullName: 'Test User',
       isEmailVerified: true,
     );
 
     test('initial state is SessionInitial', () {
-      expect(sessionCubit.state, isA<SessionInitial>());
+      expect(cubit.state, isA<SessionInitial>());
     });
 
     group('checkAuthStatus', () {
@@ -87,13 +104,13 @@ void main() {
         build: () {
           when(() => mockGetCurrentUser())
               .thenAnswer((_) async => Right(testUser));
-          when(() => mockSecureStorage.getToken())
+          when(() => mockSecureStorageService.getToken())
               .thenAnswer((_) async => 'valid_token');
           when(() => mockGetProfile(any()))
               .thenAnswer((_) async => Right(testUserInfo));
           when(() => mockSaveUser(any()))
               .thenAnswer((_) async => const Right(null));
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.checkAuthStatus(),
         expect: () => [
@@ -113,7 +130,7 @@ void main() {
         build: () {
           when(() => mockGetCurrentUser())
               .thenAnswer((_) async => const Right(null));
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.checkAuthStatus(),
         expect: () => [
@@ -128,7 +145,7 @@ void main() {
           when(() => mockGetCurrentUser()).thenAnswer(
             (_) async => const Left(CacheFailure('No cached user')),
           );
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.checkAuthStatus(),
         expect: () => [
@@ -143,7 +160,7 @@ void main() {
         'emits [SessionLoading, Unauthenticated] when logout succeeds',
         build: () {
           when(() => mockSignOut()).thenAnswer((_) async => const Right(null));
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.logout(),
         expect: () => [
@@ -161,7 +178,7 @@ void main() {
           when(() => mockSignOut()).thenAnswer(
             (_) async => const Left(ServerFailure('Logout failed')),
           );
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.logout(),
         expect: () => [
@@ -177,13 +194,13 @@ void main() {
         'emits [Authenticated] with updated user when profile refresh succeeds',
         seed: () => Authenticated(testUser),
         build: () {
-          when(() => mockSecureStorage.getToken())
+          when(() => mockSecureStorageService.getToken())
               .thenAnswer((_) async => 'valid_token');
           when(() => mockGetProfile(any()))
               .thenAnswer((_) async => Right(testUserInfo));
           when(() => mockSaveUser(any()))
               .thenAnswer((_) async => const Right(null));
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.refreshUserProfile(),
         expect: () => [
@@ -202,9 +219,9 @@ void main() {
         'emits [Authenticated] with current user when no token available',
         seed: () => Authenticated(testUser),
         build: () {
-          when(() => mockSecureStorage.getToken())
+          when(() => mockSecureStorageService.getToken())
               .thenAnswer((_) async => null);
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.refreshUserProfile(),
         expect: () => [
@@ -217,12 +234,12 @@ void main() {
         'emits [Authenticated] with current user when profile refresh fails',
         seed: () => Authenticated(testUser),
         build: () {
-          when(() => mockSecureStorage.getToken())
+          when(() => mockSecureStorageService.getToken())
               .thenAnswer((_) async => 'valid_token');
           when(() => mockGetProfile(any())).thenAnswer(
             (_) async => const Left(ServerFailure('Profile fetch failed')),
           );
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.refreshUserProfile(),
         expect: () => [
@@ -234,9 +251,9 @@ void main() {
       blocTest<SessionCubit, SessionState>(
         'does nothing when not authenticated',
         build: () {
-          when(() => mockSecureStorage.getToken())
+          when(() => mockSecureStorageService.getToken())
               .thenAnswer((_) async => null);
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.refreshUserProfile(),
         expect: () => [],
@@ -256,7 +273,7 @@ void main() {
 
       blocTest<SessionCubit, SessionState>(
         'emits [Authenticated] with new user',
-        build: () => sessionCubit,
+        build: () => cubit,
         act: (cubit) => cubit.updateUser(updatedUser),
         expect: () => [
           isA<Authenticated>().having((s) => s.user, 'user', updatedUser),
@@ -272,7 +289,7 @@ void main() {
         build: () {
           when(() => mockUpdateCurrency(any()))
               .thenAnswer((_) async => const Right(null));
-          return sessionCubit;
+          return cubit;
         },
         act: (cubit) => cubit.updateUserCurrency(tCurrency),
         expect: () => [],

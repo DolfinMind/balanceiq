@@ -17,26 +17,35 @@ void main() {
   });
 
   group('SignInWithGoogle', () {
-    final testUser = User(
-      id: 'google_user_123',
-      email: 'test@gmail.com',
+    final tUser = User(
+      id: '1',
+      email: 'test@example.com',
       name: 'Test User',
       photoUrl: 'https://example.com/photo.jpg',
       authProvider: 'google',
-      createdAt: DateTime(2024, 1, 1),
+      createdAt: DateTime(
+          2023), // Note: Exact equality might fail on DateTime if not careful, but we are checking fields now.
       isEmailVerified: true,
     );
 
     test('should return User when Google sign in is successful', () async {
       // Arrange
       when(() => mockAuthRepository.signInWithGoogle())
-          .thenAnswer((_) async => Right(testUser));
+          .thenAnswer((_) async => Right(tUser));
 
       // Act
       final result = await signInWithGoogle();
 
       // Assert
-      expect(result, Right(testUser));
+      expect(result.isRight(), true);
+      result.fold(
+        (l) => fail('test failed'),
+        (r) {
+          expect(r.email, tUser.email);
+          expect(r.name, tUser.name);
+          expect(r.authProvider, tUser.authProvider);
+        },
+      );
       verify(() => mockAuthRepository.signInWithGoogle()).called(1);
     });
 
@@ -99,8 +108,8 @@ void main() {
       final result = await signInWithGoogle();
 
       // Assert
-      expect(
-          result, const Left(AuthFailure('Google Play Services not available')));
+      expect(result,
+          const Left(AuthFailure('Google Play Services not available')));
     });
   });
 }

@@ -10,46 +10,14 @@ abstract class AuthRepository {
   Future<Either<Failure, User?>> getCurrentUser();
   Future<Either<Failure, bool>> isSignedIn();
 
-  // Backend API Methods
-  Future<Either<Failure, SignupResponse>> signup({
-    required String username,
-    required String password,
-    required String fullName,
-    required String email,
-  });
-
-  Future<Either<Failure, LoginResponse>> login({
-    required String username,
-    required String password,
-  });
-
   Future<Either<Failure, UserInfo>> getProfile(String token);
 
-  Future<Either<Failure, void>> changePassword({
-    required String currentPassword,
-    required String newPassword,
-    required String confirmPassword,
-    required String token,
-  });
-
-  Future<Either<Failure, void>> forgotPassword({required String email});
-
-  Future<Either<Failure, void>> resetPassword({
-    required String token,
-    required String newPassword,
-    required String confirmPassword,
-  });
-
-  // Email Verification Methods
-  Future<Either<Failure, void>> sendVerificationEmail(String token);
-  Future<Either<Failure, void>> resendVerificationEmail(String email);
   Future<Either<Failure, void>> updateCurrency(String currency);
   Future<Either<Failure, void>> saveUser(User user);
 
   // Profile Update
   Future<Either<Failure, UserInfo>> updateProfile({
     String? fullName,
-    String? username,
     String? email,
     String? currency,
   });

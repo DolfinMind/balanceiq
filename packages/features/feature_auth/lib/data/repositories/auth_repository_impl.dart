@@ -26,8 +26,8 @@ class AuthRepositoryImpl implements AuthRepository {
         final data = loginResponse.data!;
 
         // 1. Save Token and Refresh Token
-        if (data.token.isNotEmpty) {
-          await localDataSource.saveAuthToken(data.token);
+        if (data.accessToken.isNotEmpty) {
+          await localDataSource.saveAuthToken(data.accessToken);
         }
         if (data.refreshToken.isNotEmpty) {
           await localDataSource.saveRefreshToken(data.refreshToken);
@@ -35,15 +35,15 @@ class AuthRepositoryImpl implements AuthRepository {
 
         // 2. Create User Model
         final userModel = UserModel(
-          id: data.userId.toString(),
-          email: data.email,
-          name: data.username,
-          // Note: LoginResponse data might not have photoUrl,
-          // defaulting to null as it will be fetched via getProfile later if needed
-          photoUrl: null,
-          authProvider: 'google',
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.fullName,
+          photoUrl: data.user.avatarUrl,
+          authProvider: data.user.authProvider ?? 'google',
           createdAt: DateTime.now(),
-          isEmailVerified: data.isEmailVerified,
+          isEmailVerified: data.user.isEmailVerified,
+          currency: data.user
+              .currency, // Add currency if available in UserInfo and UserModel
         );
 
         // 3. Save User Locally
@@ -58,6 +58,7 @@ class AuthRepositoryImpl implements AuthRepository {
           authProvider: userModel.authProvider,
           createdAt: userModel.createdAt,
           isEmailVerified: userModel.isEmailVerified,
+          currency: userModel.currency,
         ));
       } else {
         return Left(AuthFailure(loginResponse.message));
@@ -103,64 +104,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, SignupResponse>> signup({
-    required String username,
-    required String password,
-    required String fullName,
-    required String email,
-  }) async {
-    try {
-      final request = SignupRequest(
-        username: username,
-        password: password,
-        fullName: fullName,
-        email: email,
-      );
-      final response = await remoteDataSource.signup(request);
-      return Right(response);
-    } on AppException catch (e) {
-      return Left(_mapExceptionToFailure(e));
-    } catch (e) {
-      return Left(ServerFailure('Failed to signup: $e'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, LoginResponse>> login({
-    required String username,
-    required String password,
-  }) async {
-    try {
-      final request = LoginRequest(
-        username: username,
-        password: password,
-      );
-      final response = await remoteDataSource.login(request);
-
-      // Save user to local storage after successful login
-      if (response.success && response.data != null) {
-        final userModel = UserModel(
-          id: response.data!.userId.toString(),
-          email: response.data!.email,
-          name: response.data!.username,
-          photoUrl: null,
-          authProvider: 'email',
-          createdAt: DateTime.now(),
-          isEmailVerified: response.data!.isEmailVerified,
-        );
-        await localDataSource.saveUser(userModel);
-        await localDataSource.saveAuthToken(response.data!.token);
-      }
-
-      return Right(response);
-    } on AppException catch (e) {
-      return Left(_mapExceptionToFailure(e));
-    } catch (e) {
-      return Left(ServerFailure('Failed to login: $e'));
-    }
-  }
-
-  @override
   Future<Either<Failure, UserInfo>> getProfile(String token) async {
     try {
       final profile = await remoteDataSource.getProfile(token);
@@ -173,97 +116,23 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> changePassword({
-    required String currentPassword,
-    required String newPassword,
-    required String confirmPassword,
-    required String token,
-  }) async {
-    try {
-      final request = ChangePasswordRequest(
-        currentPassword: currentPassword,
-        newPassword: newPassword,
-        confirmPassword: confirmPassword,
-      );
-      await remoteDataSource.changePassword(request, token);
-      return const Right(null);
-    } on AppException catch (e) {
-      return Left(_mapExceptionToFailure(e));
-    } catch (e) {
-      return Left(ServerFailure('Failed to change password: $e'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> forgotPassword({required String email}) async {
-    try {
-      final request = ForgotPasswordRequest(email: email);
-      await remoteDataSource.forgotPassword(request);
-      return const Right(null);
-    } on AppException catch (e) {
-      return Left(_mapExceptionToFailure(e));
-    } catch (e) {
-      return Left(ServerFailure('Failed to send forgot password email: $e'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> resetPassword({
-    required String token,
-    required String newPassword,
-    required String confirmPassword,
-  }) async {
-    try {
-      final request = ResetPasswordRequest(
-        token: token,
-        newPassword: newPassword,
-        confirmPassword: confirmPassword,
-      );
-      await remoteDataSource.resetPassword(request);
-      return const Right(null);
-    } on AppException catch (e) {
-      return Left(_mapExceptionToFailure(e));
-    } catch (e) {
-      return Left(ServerFailure('Failed to reset password: $e'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> sendVerificationEmail(String token) async {
-    try {
-      await remoteDataSource.sendVerificationEmail(token);
-      return const Right(null);
-    } on AppException catch (e) {
-      return Left(_mapExceptionToFailure(e));
-    } catch (e) {
-      return Left(ServerFailure('Failed to send verification email: $e'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> resendVerificationEmail(String email) async {
-    try {
-      await remoteDataSource.resendVerificationEmail(email);
-      return const Right(null);
-    } on AppException catch (e) {
-      return Left(_mapExceptionToFailure(e));
-    } catch (e) {
-      return Left(ServerFailure('Failed to resend verification email: $e'));
-    }
-  }
-
-  @override
   Future<Either<Failure, void>> updateCurrency(String currency) async {
     try {
       await remoteDataSource.updateCurrency(currency);
-      // Also update local user cache if needed, but SessionCubit usually reloads or updates state
-      // We can update the cached user's currency here if we want to be consistent
+      // Update local user cache
       final currentUser = await localDataSource.getCachedUser();
       if (currentUser != null) {
-        // Assuming UserModel doesn't have currency field yet?
-        // Based on previous reads, UserModel has id, email, name, etc.
-        // Currency is handled by CurrencyCubit separately in dolfin_core.
-        // So we don't need to update UserModel here.
+        final updatedUser = UserModel(
+          id: currentUser.id,
+          email: currentUser.email,
+          name: currentUser.name,
+          photoUrl: currentUser.photoUrl,
+          authProvider: currentUser.authProvider,
+          createdAt: currentUser.createdAt,
+          isEmailVerified: currentUser.isEmailVerified,
+          currency: currency,
+        );
+        await localDataSource.saveUser(updatedUser);
       }
       return const Right(null);
     } on AppException catch (e) {
@@ -296,14 +165,12 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserInfo>> updateProfile({
     String? fullName,
-    String? username,
     String? email,
     String? currency,
   }) async {
     try {
       final request = UpdateProfileRequest(
         fullName: fullName,
-        username: username,
         email: email,
         currency: currency,
       );
@@ -317,8 +184,9 @@ class AuthRepositoryImpl implements AuthRepository {
             id: currentUser.id,
             email: response.data!.email,
             name: response.data!.fullName,
-            photoUrl: response.data!.photoUrl,
-            authProvider: currentUser.authProvider,
+            photoUrl: response.data!.avatarUrl,
+            authProvider:
+                response.data!.authProvider ?? currentUser.authProvider,
             currency: response.data!.currency,
             createdAt: currentUser.createdAt,
             isEmailVerified: response.data!.isEmailVerified,

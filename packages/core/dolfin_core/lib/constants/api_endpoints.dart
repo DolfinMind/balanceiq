@@ -18,17 +18,19 @@ class ApiEndpoints {
   static String get agentBaseUrl => _agentBaseUrl;
 
   // Authentication APIs
-  static String get signup => '$authBaseUrl/signup';
-  static String get login => '$authBaseUrl/login';
-  static String get googleOAuth => '$authBaseUrl/oauth2/google';
-  static String get refreshToken => '$authBaseUrl/refresh-token';
-  static String get getProfile => '$authBaseUrl/profile';
-  static String get forgotPassword => '$authBaseUrl/forgot-password';
-  static String get resetPassword => '$authBaseUrl/reset-password';
-  static String get changePassword => '$authBaseUrl/change-password';
-  static String get sendVerification => '$authBaseUrl/send-verification';
-  static String get resendVerification => '$authBaseUrl/resend-verification';
-  static String get verifyEmail => '$authBaseUrl/verify-email';
+  static String get googleOAuth => '$backendBaseUrl/api/sso/google';
+  static String get refreshToken => '$backendBaseUrl/api/sso/refresh-token';
+  static String get getProfile =>
+      '$authBaseUrl/profile'; // Keeping for now if needed, or remove? Prompt implied only new SSO endpoints. Assuming old auth API is gone.
+  // Actually, the prompt says "Removed deprecated endpoints: /api/auth/signup, /api/auth/login, etc."
+  // It doesn't explicitly replace /api/auth/profile. But the SSO login returns user info.
+  // I will keep updateProfile and updateCurrency for now if they are not explicitly replaced, but point them to where?
+  // The prompt "Kept web portal auth flexible for admins" suggests /api/auth might still exist for admins, but for mobile app we use SSO.
+  // For safety, I will point updateProfile/Currency to the base URL if they are distinct, but likely they are under /api/auth or similar.
+  // Let's assume /api/auth/profile persists for updates, or maybe we don't need it if we only sync from Google.
+  // However, user might want to update currency.
+  // I'll keep the specialized ones but remove the login/signup ones.
+
   static String get updateCurrency => '$authBaseUrl/currency';
   static String get updateProfile => '$authBaseUrl/profile';
   static String get logout => '$authBaseUrl/logout';

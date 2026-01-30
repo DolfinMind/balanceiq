@@ -10,8 +10,6 @@ import 'package:mocktail/mocktail.dart';
 import '../../mocks.dart';
 
 // Fallback values for mocktail's any() matcher
-class FakeLoginRequest extends Fake implements LoginRequest {}
-
 class FakeUserModel extends Fake implements UserModel {}
 
 void main() {
@@ -20,7 +18,6 @@ void main() {
   late MockAuthLocalDataSource mockLocalDataSource;
 
   setUpAll(() {
-    registerFallbackValue(FakeLoginRequest());
     registerFallbackValue(FakeUserModel());
   });
 
@@ -38,25 +35,27 @@ void main() {
     email: 'test@example.com',
     name: 'Test User',
     photoUrl: null,
-    authProvider: 'email',
+    authProvider: 'google',
     createdAt: DateTime(2023, 1, 1),
     isEmailVerified: true,
   );
 
   group('signInWithGoogle', () {
-    // Reuse tLoginResponse from login group, but define it here or move it up
     final tGoogleLoginResponse = LoginResponse(
       success: true,
       message: 'Success',
-      timestamp: 1234567890,
       data: LoginData(
-        username: tUserModel.name,
-        email: tUserModel.email,
-        token: 'token',
+        accessToken: 'token',
         refreshToken: 'refresh_token',
-        role: 'USER',
-        userId: int.parse(tUserModel.id),
-        isEmailVerified: true,
+        appCode: 'ECHO_MEMORY',
+        isNewUser: false,
+        user: UserInfo(
+            id: '1',
+            email: tUserModel.email,
+            fullName: tUserModel.name,
+            authProvider: 'google',
+            isEmailVerified: true,
+            currency: 'USD'),
       ),
     );
 
@@ -74,16 +73,6 @@ void main() {
       final result = await repository.signInWithGoogle();
 
       // Assert
-      // We expect a user that matches tUserModel but we must ensure properties match what we put in tGoogleLoginResponse
-      // tUserModel has 'email' auth provider, expected will have 'google'
-      // tUserModel has 'email' auth provider, expected will have 'google'
-
-      // Since userModel.createdAt uses DateTime.now(), we can't assert exact equality on the whole object easily
-      // unless we mock DateTime or check specific fields.
-      // However, Equatable should handle equality if fields match.
-      // But createdAt will differ.
-      // Relax assert to check Right(User) type and properties.
-
       expect(result.isRight(), true);
       result.fold(
         (l) => fail('Should be Right'),
@@ -112,61 +101,6 @@ void main() {
       // Assert
       expect(result, const Left(ServerFailure('Server Error')));
       verify(() => mockRemoteDataSource.signInWithGoogle()).called(1);
-      verifyNever(() => mockLocalDataSource.saveUser(any()));
-    });
-  });
-
-  group('login', () {
-    const tUsername = 'testuser';
-    const tPassword = 'password';
-    final tLoginResponse = LoginResponse(
-      success: true,
-      message: 'Success',
-      timestamp: 1234567890,
-      data: LoginData(
-        username: 'Test User',
-        email: 'test@example.com',
-        token: 'token',
-        refreshToken: 'refresh_token',
-        role: 'USER',
-        userId: 1,
-        isEmailVerified: true,
-      ),
-    );
-
-    test('should return LoginResponse and save user when call is successful',
-        () async {
-      // Arrange
-      when(() => mockRemoteDataSource.login(any()))
-          .thenAnswer((_) async => tLoginResponse);
-      when(() => mockLocalDataSource.saveUser(any())).thenAnswer((_) async {});
-
-      // Act
-      final result = await repository.login(
-        username: tUsername,
-        password: tPassword,
-      );
-
-      // Assert
-      expect(result, Right(tLoginResponse));
-      verify(() => mockRemoteDataSource.login(any())).called(1);
-      verify(() => mockLocalDataSource.saveUser(any())).called(1);
-    });
-
-    test('should return ServerFailure when call fails', () async {
-      // Arrange
-      when(() => mockRemoteDataSource.login(any()))
-          .thenThrow(const ServerException('Failed'));
-
-      // Act
-      final result = await repository.login(
-        username: tUsername,
-        password: tPassword,
-      );
-
-      // Assert
-      expect(result, const Left(ServerFailure('Failed')));
-      verify(() => mockRemoteDataSource.login(any())).called(1);
       verifyNever(() => mockLocalDataSource.saveUser(any()));
     });
   });

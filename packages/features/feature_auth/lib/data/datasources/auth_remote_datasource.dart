@@ -12,24 +12,12 @@ abstract class AuthRemoteDataSource {
   // OAuth Methods
   Future<LoginResponse> signInWithGoogle();
   Future<void> signOut();
-
-  // Backend API Methods
-  Future<SignupResponse> signup(SignupRequest request);
-  Future<LoginResponse> login(LoginRequest request);
   Future<RefreshTokenResponse> refreshToken(String refreshToken);
+
+  // Profile Methods
   Future<UserInfo> getProfile(String token);
-  Future<void> changePassword(ChangePasswordRequest request, String token);
-  Future<void> forgotPassword(ForgotPasswordRequest request);
-  Future<void> resetPassword(ResetPasswordRequest request);
-
-  // Email Verification Methods
-  Future<void> sendVerificationEmail(String token);
-  Future<void> resendVerificationEmail(String email);
-
-  // New Methods
-  Future<void> updateCurrency(String currency);
-  Future<void> logout();
   Future<UpdateProfileResponse> updateProfile(UpdateProfileRequest request);
+  Future<void> updateCurrency(String currency);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -65,10 +53,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw const AuthException('Failed to retrieve Google ID Token');
       }
 
-      // 3. Send idToken to backend for verification and session creation
+      // 3. Send idToken to backend SSO endpoint
       final response = await dio.post(
         ApiEndpoints.googleOAuth,
-        data: {'idToken': idToken},
+        data: {
+          'idToken': idToken,
+          'appCode': 'ECHO_MEMORY',
+        },
         options: Options(
           headers: {'Content-Type': 'application/json'},
           sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
@@ -77,17 +68,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        final jsonResponse = response.data;
-        // Parse directly to LoginResponse
-        // Assuming backend returns similar structure for OAuth as Login
-        // If not, we might need to adapt it.
-        // Based on previous code: jsonResponse['data'] had 'token', 'userId', etc.
-        // LoginResponse.fromJson looks for 'data' key which contains LoginData.
+        final loginResponse = LoginResponse.fromJson(response.data);
 
-        // Let's inspect LoginResponse.fromJson again.
-        // It expects { success: bool, message: str, data: { token: str ... } }
+        // Store the tokens in SecureStorage
+        if (loginResponse.data != null) {
+          await secureStorage.saveToken(loginResponse.data!.accessToken);
+          await secureStorage
+              .saveRefreshToken(loginResponse.data!.refreshToken);
+          // Also save user ID if available, ensuring string compatibility
+          await secureStorage.saveUserId(loginResponse.data!.user.id);
+        }
 
-        return LoginResponse.fromJson(jsonResponse);
+        return loginResponse;
       } else {
         // Backend failed - sign out so user can try different account
         await googleSignIn.signOut();
@@ -109,9 +101,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Sign out from Google
       await googleSignIn.signOut();
 
-      // Call Backend Logout API
+      // Call Backend Logout API if exists
+      // Assuming logout endpoint clears server session
       try {
-        await logout();
+        await dio.post(
+          ApiEndpoints.logout,
+          options: Options(
+            headers: {'Content-Type': 'application/json'},
+            sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
+            receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
+          ),
+        );
       } catch (_) {
         // Ignore backend logout errors during local sign out
       }
@@ -120,54 +120,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await secureStorage.clearAllTokens();
     } catch (e) {
       throw ErrorHandler.handle(e, source: 'signOut');
-    }
-  }
-
-  @override
-  Future<SignupResponse> signup(SignupRequest request) async {
-    try {
-      final response = await dio.post(
-        ApiEndpoints.signup,
-        data: request.toJson(),
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
-          receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
-        ),
-      );
-
-      return SignupResponse.fromJson(response.data);
-    } catch (e) {
-      throw ErrorHandler.handle(e, source: 'signup');
-    }
-  }
-
-  @override
-  Future<LoginResponse> login(LoginRequest request) async {
-    try {
-      final response = await dio.post(
-        ApiEndpoints.login,
-        data: request.toJson(),
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
-          receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
-        ),
-      );
-
-      final loginResponse = LoginResponse.fromJson(response.data);
-
-      // Store the token in SecureStorage
-      if (loginResponse.data?.token != null) {
-        await secureStorage.saveToken(loginResponse.data!.token);
-      }
-      if (loginResponse.data?.refreshToken != null) {
-        await secureStorage.saveRefreshToken(loginResponse.data!.refreshToken);
-      }
-
-      return loginResponse;
-    } catch (e) {
-      throw ErrorHandler.handle(e, source: 'login');
     }
   }
 
@@ -185,10 +137,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       final refreshResponse = RefreshTokenResponse.fromJson(response.data);
-      if (refreshResponse.data?.token != null) {
-        await secureStorage.saveToken(refreshResponse.data!.token);
-      }
-      if (refreshResponse.data?.refreshToken != null) {
+      if (refreshResponse.data != null) {
+        await secureStorage.saveToken(refreshResponse.data!.accessToken);
         await secureStorage
             .saveRefreshToken(refreshResponse.data!.refreshToken);
       }
@@ -213,100 +163,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ),
       );
 
+      // Handle wrapped response { success: true, data: { ... } }
+      final json = response.data;
+      if (json is Map<String, dynamic> && json.containsKey('data')) {
+        return UserInfo.fromJson(json['data']);
+      }
+
       return UserInfo.fromJson(response.data);
     } catch (e) {
       throw ErrorHandler.handle(e, source: 'getProfile');
-    }
-  }
-
-  @override
-  Future<void> changePassword(
-      ChangePasswordRequest request, String token) async {
-    try {
-      await dio.post(
-        ApiEndpoints.changePassword,
-        data: request.toJson(),
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-          sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
-          receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
-        ),
-      );
-    } catch (e) {
-      throw ErrorHandler.handle(e, source: 'changePassword');
-    }
-  }
-
-  @override
-  Future<void> forgotPassword(ForgotPasswordRequest request) async {
-    try {
-      await dio.post(
-        ApiEndpoints.forgotPassword,
-        data: request.toJson(),
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
-          receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
-        ),
-      );
-    } catch (e) {
-      throw ErrorHandler.handle(e, source: 'forgotPassword');
-    }
-  }
-
-  @override
-  Future<void> resetPassword(ResetPasswordRequest request) async {
-    try {
-      await dio.post(
-        ApiEndpoints.resetPassword,
-        data: request.toJson(),
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
-          receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
-        ),
-      );
-    } catch (e) {
-      throw ErrorHandler.handle(e, source: 'resetPassword');
-    }
-  }
-
-  @override
-  Future<void> sendVerificationEmail(String token) async {
-    try {
-      // Note: AuthInterceptor automatically adds Authorization header from SharedPreferences
-      await dio.post(
-        ApiEndpoints.sendVerification,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
-          receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
-        ),
-      );
-    } catch (e) {
-      throw ErrorHandler.handle(e, source: 'sendVerificationEmail');
-    }
-  }
-
-  @override
-  Future<void> resendVerificationEmail(String email) async {
-    try {
-      await dio.post(
-        ApiEndpoints.resendVerification,
-        data: {'email': email},
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
-          receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
-        ),
-      );
-    } catch (e) {
-      throw ErrorHandler.handle(e, source: 'resendVerificationEmail');
     }
   }
 
@@ -324,22 +189,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
     } catch (e) {
       throw ErrorHandler.handle(e, source: 'updateCurrency');
-    }
-  }
-
-  @override
-  Future<void> logout() async {
-    try {
-      await dio.post(
-        ApiEndpoints.logout,
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          sendTimeout: GetIt.instance<AppConstants>().apiTimeout,
-          receiveTimeout: GetIt.instance<AppConstants>().apiTimeout,
-        ),
-      );
-    } catch (e) {
-      throw ErrorHandler.handle(e, source: 'logout');
     }
   }
 

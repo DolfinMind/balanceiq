@@ -15,7 +15,7 @@ import 'package:dolfin_core/utils/snackbar_utils.dart';
 import 'package:feature_subscription/presentation/cubit/subscription_cubit.dart';
 import 'package:feature_subscription/presentation/cubit/subscription_state.dart';
 import "package:feature_auth/presentation/cubit/session/session_cubit.dart";
-import "package:feature_auth/presentation/cubit/signup/signup_cubit.dart";
+
 import 'package:dolfin_ui_kit/theme/theme_cubit.dart';
 import 'package:dolfin_ui_kit/theme/theme_state.dart';
 import '../widgets/profile/profile_widgets.dart';
@@ -106,18 +106,6 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
-  void _handleEmailVerificationClick(BuildContext ctx, dynamic user) {
-    final tourCubit = ctx.read<ProductTourCubit>();
-
-    // Send verification email using SignupCubit
-    ctx.read<SignupCubit>().sendEmailVerification(user);
-
-    // If tour is active at email verify step, advance to modal
-    if (tourCubit.isAtStep(TourStep.profileEmailVerify)) {
-      tourCubit.onEmailVerificationClicked();
-    }
-  }
-
   void _showEmailSentModal() {
     final tourCubit = context.read<ProductTourCubit>();
 
@@ -180,10 +168,6 @@ class _ProfilePageState extends State<ProfilePage>
           create: (_) =>
               GetIt.instance<SubscriptionCubit>()..loadSubscriptionStatus(),
         ),
-        // Provide SignupCubit locally for verification feature in Profile
-        BlocProvider(
-          create: (_) => GetIt.instance<SignupCubit>(),
-        ),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -200,16 +184,7 @@ class _ProfilePageState extends State<ProfilePage>
           BlocListener<ProductTourCubit, ProductTourState>(
             listener: (context, tourState) {
               if (tourState is TourActive && !tourState.isTransitioning) {
-                if (tourState.currentStep == TourStep.profileEmailVerify) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    showEmailVerifyTour();
-                  });
-                } else if (tourState.currentStep == TourStep.emailSentModal) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _showEmailSentModal();
-                  });
-                } else if (tourState.currentStep ==
-                    TourStep.profileSubscription) {
+                if (tourState.currentStep == TourStep.profileSubscription) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     showSubscriptionTour();
                   });
@@ -259,15 +234,17 @@ class _ProfilePageState extends State<ProfilePage>
                   children: [
                     const SizedBox(height: 16),
                     // Email Verification Banner (if not verified)
+                    // Email Verification Banner (if not verified) - Removed for SSO
+                    /*
                     if (!user.isEmailVerified)
                       Container(
                         key: emailVerifyKey,
                         child: EmailVerificationBanner(
                           user: user,
-                          onVerificationClick: () =>
-                              _handleEmailVerificationClick(context, user),
+                          onVerificationClick: () {}, // No longer supported manually
                         ),
                       ),
+                    */
                     // Profile Header with dynamic subscription badge
                     BlocBuilder<SubscriptionCubit, SubscriptionState>(
                       builder: (context, subState) {
@@ -361,13 +338,6 @@ class _ProfilePageState extends State<ProfilePage>
                       icon: LucideIcons.lock,
                       title: GetIt.I<AuthStrings>().profile.security,
                       subItems: [
-                        ProfileSubMenuItem(
-                          icon: LucideIcons.keyRound,
-                          title: GetIt.I<AuthStrings>().profile.changePassword,
-                          onTap: () {
-                            Navigator.pushNamed(context, '/change-password');
-                          },
-                        ),
                         // ADDED APP LOCK HERE (during restoration to save a step)
                         if (_canCheckBiometrics)
                           ProfileSubMenuItem(

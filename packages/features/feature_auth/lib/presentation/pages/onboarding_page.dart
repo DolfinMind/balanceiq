@@ -25,7 +25,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   void _navigateToSignUp() {
-    Navigator.pushReplacementNamed(context, '/signup');
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override

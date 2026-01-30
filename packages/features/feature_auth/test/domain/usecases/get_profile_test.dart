@@ -19,12 +19,11 @@ void main() {
   group('GetProfile', () {
     const testToken = 'test_jwt_token';
     final testUserInfo = UserInfo(
-      id: 1,
-      username: 'testuser',
+      id: '1',
       email: 'test@example.com',
       fullName: 'Test User',
-      photoUrl: 'https://example.com/photo.jpg',
-      roles: ['USER'],
+      avatarUrl: 'https://example.com/photo.jpg',
+      currency: 'USD',
       isEmailVerified: true,
     );
 

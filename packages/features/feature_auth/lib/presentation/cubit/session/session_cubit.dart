@@ -77,6 +77,7 @@ class SessionCubit extends Cubit<SessionState> {
   final SaveUser saveUser;
   final SecureStorageService secureStorage;
   final CurrencyCubit currencyCubit;
+  final BaseCacheManager cacheManager;
 
   SessionCubit({
     required this.getCurrentUser,
@@ -87,7 +88,9 @@ class SessionCubit extends Cubit<SessionState> {
     required this.saveUser,
     required this.secureStorage,
     required this.currencyCubit,
-  }) : super(SessionInitial());
+    BaseCacheManager? cacheManager,
+  })  : cacheManager = cacheManager ?? DefaultCacheManager(),
+        super(SessionInitial());
 
   /// Check for existing session on app start
   Future<void> checkAuthStatus() async {
@@ -114,7 +117,7 @@ class SessionCubit extends Cubit<SessionState> {
       (failure) => emit(SessionError(failure.message)),
       (_) async {
         await currencyCubit.reset();
-        await DefaultCacheManager().emptyCache();
+        await cacheManager.emptyCache();
         await secureStorage.deleteAll();
         emit(Unauthenticated());
       },
@@ -169,7 +172,7 @@ class SessionCubit extends Cubit<SessionState> {
           id: userInfo.id.toString(),
           email: userInfo.email,
           name: userInfo.fullName,
-          photoUrl: userInfo.photoUrl,
+          photoUrl: userInfo.avatarUrl,
           currency: userInfo.currency,
           // If authProvider not in userInfo, fallback to current user's provider or 'email'
           authProvider: currentUser?.authProvider ?? 'email',
@@ -244,7 +247,6 @@ class SessionCubit extends Cubit<SessionState> {
 
     final result = await updateProfileUseCase(
       fullName: fullName,
-      username: username,
       email: email,
       currency: currency,
     );
@@ -258,7 +260,7 @@ class SessionCubit extends Cubit<SessionState> {
           id: userInfo.id.toString(),
           email: userInfo.email,
           name: userInfo.fullName,
-          photoUrl: userInfo.photoUrl,
+          photoUrl: userInfo.avatarUrl,
           currency: userInfo.currency,
           authProvider: currentUser!.authProvider,
           createdAt: currentUser.createdAt,

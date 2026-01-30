@@ -13,14 +13,7 @@ import 'package:feature_auth/data/datasources/auth_mock_datasource.dart';
 import 'package:feature_auth/data/datasources/auth_local_datasource.dart';
 import 'package:feature_auth/data/repositories/auth_repository_impl.dart';
 import 'package:feature_auth/domain/repositories/auth_repository.dart';
-import 'package:feature_auth/domain/usecases/signup.dart';
-import 'package:feature_auth/domain/usecases/login.dart';
 import 'package:feature_auth/domain/usecases/sign_in_with_google.dart';
-import 'package:feature_auth/domain/usecases/forgot_password.dart';
-import 'package:feature_auth/domain/usecases/reset_password.dart';
-import 'package:feature_auth/domain/usecases/change_password.dart';
-import 'package:feature_auth/domain/usecases/send_verification_email.dart';
-import 'package:feature_auth/domain/usecases/resend_verification_email.dart';
 import 'package:feature_auth/domain/usecases/get_current_user.dart';
 import 'package:feature_auth/domain/usecases/sign_out.dart';
 import 'package:feature_auth/domain/usecases/get_profile.dart';
@@ -28,23 +21,17 @@ import 'package:feature_auth/domain/usecases/update_currency.dart';
 import 'package:feature_auth/domain/usecases/update_profile.dart';
 import 'package:feature_auth/domain/usecases/save_user.dart';
 
-import 'package:feature_auth/presentation/cubit/signup/signup_cubit.dart';
 import 'package:feature_auth/presentation/cubit/login/login_cubit.dart';
 import 'package:feature_auth/presentation/cubit/session/session_cubit.dart';
-import 'package:feature_auth/presentation/cubit/password/password_cubit.dart';
 import 'package:feature_auth/presentation/cubit/interactive_onboarding/interactive_onboarding_cubit.dart';
 
 // Re-export common types for convenience
 export 'package:feature_auth/domain/auth_config.dart';
 export 'package:feature_auth/presentation/cubit/session/session_cubit.dart';
 export 'package:feature_auth/presentation/cubit/login/login_cubit.dart';
-export 'package:feature_auth/presentation/cubit/signup/signup_cubit.dart';
-export 'package:feature_auth/presentation/cubit/password/password_cubit.dart';
 export 'package:feature_auth/presentation/pages/login_page.dart';
-export 'package:feature_auth/presentation/pages/signup_page.dart';
 export 'package:feature_auth/presentation/pages/splash_page.dart';
 export 'package:feature_auth/presentation/pages/profile_page.dart';
-export 'package:feature_auth/presentation/pages/forgot_password_page.dart';
 export 'package:feature_auth/presentation/pages/onboarding_page.dart';
 export 'package:feature_auth/presentation/pages/webview_page.dart';
 
@@ -145,14 +132,7 @@ Future<void> initAuthFeature(GetIt sl, AuthFeatureConfig config) async {
   );
 
   // Use Cases
-  sl.registerLazySingleton(() => Signup(sl()));
-  sl.registerLazySingleton(() => Login(sl()));
   sl.registerLazySingleton(() => SignInWithGoogle(sl()));
-  sl.registerLazySingleton(() => ForgotPassword(sl()));
-  sl.registerLazySingleton(() => ResetPassword(sl()));
-  sl.registerLazySingleton(() => ChangePassword(sl()));
-  sl.registerLazySingleton(() => SendVerificationEmail(sl()));
-  sl.registerLazySingleton(() => ResendVerificationEmail(sl()));
   sl.registerLazySingleton(() => GetCurrentUser(sl()));
   sl.registerLazySingleton(() => SignOut(sl()));
 
@@ -162,17 +142,7 @@ Future<void> initAuthFeature(GetIt sl, AuthFeatureConfig config) async {
   sl.registerLazySingleton(() => SaveUser(sl()));
 
   // Cubits
-  sl.registerFactory(() => SignupCubit(
-        signup: sl(),
-        signInWithGoogle: sl(),
-        sendVerificationEmail: sl(),
-        resendVerificationEmail: sl(),
-        secureStorage: config.secureStorage,
-        analyticsService: config.analyticsService,
-      ));
-
   sl.registerFactory(() => LoginCubit(
-        login: sl(),
         signInWithGoogle: sl(),
         getProfile: sl(),
         saveUser: sl(),
@@ -190,13 +160,6 @@ Future<void> initAuthFeature(GetIt sl, AuthFeatureConfig config) async {
         saveUser: sl(),
         secureStorage: config.secureStorage,
         currencyCubit: sl(),
-      ));
-
-  sl.registerFactory(() => PasswordCubit(
-        changePassword: sl(),
-        forgotPassword: sl(),
-        resetPassword: sl(),
-        secureStorage: config.secureStorage,
       ));
 
   sl.registerFactory(() => InteractiveOnboardingCubit());

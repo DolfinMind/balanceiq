@@ -10,10 +10,9 @@ import 'package:get_it/get_it.dart';
 
 mixin ProfileTourMixin on State<ProfilePage> {
   TutorialCoachMark? _tutorialCoachMark;
-  bool _emailVerifyTourShown = false;
+
   bool _subscriptionTourShown = false;
 
-  final GlobalKey emailVerifyKey = GlobalKey();
   final GlobalKey subscriptionCardKey = GlobalKey();
 
   void checkAndShowTour() {
@@ -23,61 +22,10 @@ mixin ProfileTourMixin on State<ProfilePage> {
     final tourState = tourCubit.state;
 
     if (tourState is TourActive) {
-      if (tourState.currentStep == TourStep.profileEmailVerify) {
-        showEmailVerifyTour();
-      } else if (tourState.currentStep == TourStep.profileSubscription) {
+      if (tourState.currentStep == TourStep.profileSubscription) {
         showSubscriptionTour();
       }
     }
-  }
-
-  void showEmailVerifyTour() {
-    if (_emailVerifyTourShown) return;
-    if (emailVerifyKey.currentContext == null) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) showEmailVerifyTour();
-      });
-      return;
-    }
-
-    _emailVerifyTourShown = true;
-    final tourCubit = context.read<ProductTourCubit>();
-
-    final targets = [
-      TargetFocus(
-        identify: 'email_verify',
-        keyTarget: emailVerifyKey,
-        alignSkip: Alignment.bottomRight,
-        enableOverlayTab: false,
-        enableTargetTab: true,
-        shape: ShapeLightFocus.RRect,
-        radius: 16,
-        contents: [
-          TargetContent(
-            align: ContentAlign.bottom,
-            builder: (context, controller) {
-              return GetIt.instance<TourWidgetFactory>().createTooltip(
-                icon: Icons.email_outlined,
-                title: 'Verify Your Email',
-                description:
-                    'Click the button to send a verification email. This unlocks all features!',
-                buttonText: 'Got it',
-                onButtonPressed: () {
-                  controller.next();
-                },
-                showSkip: true,
-                onSkip: () {
-                  tourCubit.skipTour();
-                  controller.skip();
-                },
-              );
-            },
-          ),
-        ],
-      ),
-    ];
-
-    _showTutorial(targets, tourCubit);
   }
 
   void showSubscriptionTour() {
