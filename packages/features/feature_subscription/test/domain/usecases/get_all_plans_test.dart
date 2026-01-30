@@ -25,6 +25,7 @@ void main() {
       category: 'CORE',
       requiresPermission: false,
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
     );
 
     const testPlans = [
@@ -42,6 +43,7 @@ void main() {
         maxTeamMembers: 1,
         features: [testFeature],
         isActive: true,
+        subscriptionStatus: 'ACTIVE',
       ),
       Plan(
         id: 2,
@@ -57,6 +59,7 @@ void main() {
         maxTeamMembers: 5,
         features: [testFeature],
         isActive: true,
+        subscriptionStatus: 'ACTIVE',
       ),
     ];
 
@@ -99,8 +102,8 @@ void main() {
 
     test('should return NetworkFailure when no internet', () async {
       // Arrange
-      when(() => mockSubscriptionRepository.getAllPlans())
-          .thenAnswer((_) async => const Left(NetworkFailure('No internet connection')));
+      when(() => mockSubscriptionRepository.getAllPlans()).thenAnswer(
+          (_) async => const Left(NetworkFailure('No internet connection')));
 
       // Act
       final result = await getAllPlans();

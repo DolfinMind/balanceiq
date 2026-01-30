@@ -53,6 +53,7 @@ void main() {
       category: 'CORE',
       requiresPermission: false,
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
     );
 
     const testPlan = Plan(
@@ -69,6 +70,7 @@ void main() {
       maxTeamMembers: 5,
       features: [testFeature],
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
     );
 
     const testPlans = [testPlan];
@@ -79,6 +81,7 @@ void main() {
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2024, 2, 1),
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
       daysRemaining: 30,
     );
 
@@ -370,6 +373,7 @@ void main() {
             maxTeamMembers: 1,
             features: [],
             isActive: true,
+            subscriptionStatus: 'ACTIVE',
           );
           const multiplePlans = [freePlan, testPlan];
           when(() => mockGetAllPlans())
@@ -663,6 +667,7 @@ void main() {
           startDate: DateTime(2024, 1, 1),
           endDate: DateTime(2024, 1, 8),
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
           daysRemaining: 5,
         );
         expect(expiringSoonSubscription.isExpiringSoon, isTrue);
@@ -714,6 +719,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
         expect(yearlyPlan.isMonthly, isFalse);
       });
@@ -733,6 +739,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
         expect(yearlyPlan.isYearly, isTrue);
       });

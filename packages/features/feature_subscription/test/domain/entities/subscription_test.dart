@@ -12,6 +12,7 @@ void main() {
       category: 'CORE',
       requiresPermission: false,
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
     );
 
     const testPlan = Plan(
@@ -28,6 +29,7 @@ void main() {
       maxTeamMembers: 5,
       features: [testFeature],
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
     );
 
     group('isExpired', () {
@@ -69,6 +71,7 @@ void main() {
           startDate: DateTime(2024, 1, 1),
           endDate: DateTime(2024, 2, 1),
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
           daysRemaining: 15,
         );
 
@@ -86,6 +89,7 @@ void main() {
           startDate: DateTime(2024, 1, 1),
           endDate: DateTime(2024, 2, 1),
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
           daysRemaining: 1,
         );
 

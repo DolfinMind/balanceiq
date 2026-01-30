@@ -11,6 +11,7 @@ void main() {
       category: 'CORE',
       requiresPermission: false,
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
     );
 
     group('formattedPrice', () {
@@ -30,6 +31,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -52,6 +54,7 @@ void main() {
           maxTeamMembers: 2,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -74,6 +77,7 @@ void main() {
           maxTeamMembers: 50,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -98,6 +102,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -120,6 +125,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -142,6 +148,7 @@ void main() {
           maxTeamMembers: 2,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -166,6 +173,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -188,10 +196,59 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
         expect(plan.isYearly, false);
+      });
+    });
+
+    group('isComingSoon', () {
+      test('should return true when subscriptionStatus is COMING_SOON', () {
+        // Arrange
+        const plan = Plan(
+          id: 1,
+          name: 'FUTURE_PLAN',
+          displayName: 'Future Plan',
+          description: 'Future subscription',
+          price: 99.99,
+          billingCycle: 'MONTHLY',
+          tier: 3,
+          maxProjects: 10,
+          maxStorageGb: 100,
+          maxApiCallsPerMonth: 10000,
+          maxTeamMembers: 5,
+          features: [testFeature],
+          isActive: true,
+          subscriptionStatus: 'COMING_SOON',
+        );
+
+        // Act & Assert
+        expect(plan.isComingSoon, true);
+      });
+
+      test('should return false when subscriptionStatus is ACTIVE', () {
+        // Arrange
+        const plan = Plan(
+          id: 1,
+          name: 'Current Plan',
+          displayName: 'Current Plan',
+          description: 'Current subscription',
+          price: 9.99,
+          billingCycle: 'MONTHLY',
+          tier: 1,
+          maxProjects: 10,
+          maxStorageGb: 100,
+          maxApiCallsPerMonth: 10000,
+          maxTeamMembers: 5,
+          features: [testFeature],
+          isActive: true,
+          subscriptionStatus: 'ACTIVE',
+        );
+
+        // Act & Assert
+        expect(plan.isComingSoon, false);
       });
     });
 
@@ -212,6 +269,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         const plan2 = Plan(
@@ -228,6 +286,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -251,6 +310,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         const plan2 = Plan(
@@ -267,6 +327,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert
@@ -289,6 +350,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         const plan2 = Plan(
@@ -305,6 +367,7 @@ void main() {
           maxTeamMembers: 5,
           features: [testFeature],
           isActive: true,
+          subscriptionStatus: 'ACTIVE',
         );
 
         // Act & Assert

@@ -402,7 +402,7 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: isCurrentPlan
+                    onPressed: isCurrentPlan || plan.isComingSoon
                         ? null
                         : () {
                             context
@@ -413,7 +413,7 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
                                 );
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isCurrentPlan
+                      backgroundColor: isCurrentPlan || plan.isComingSoon
                           ? Theme.of(context).disabledColor
                           : isPopular
                               ? Theme.of(context).colorScheme.secondary
@@ -427,7 +427,9 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
                     child: Text(
                       isCurrentPlan
                           ? GetIt.I<SubscriptionStrings>().currentPlan
-                          : GetIt.I<SubscriptionStrings>().subscribeButton,
+                          : plan.isComingSoon
+                              ? 'Coming Soon'
+                              : GetIt.I<SubscriptionStrings>().subscribeButton,
                       style: AppTypography.buttonMedium.copyWith(
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),

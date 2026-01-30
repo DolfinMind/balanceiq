@@ -26,6 +26,7 @@ void main() {
       category: 'CORE',
       requiresPermission: false,
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
     );
 
     const testPlan = Plan(
@@ -42,6 +43,7 @@ void main() {
       maxTeamMembers: 5,
       features: [testFeature],
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
     );
 
     final testSubscription = Subscription(
@@ -50,6 +52,7 @@ void main() {
       startDate: DateTime.parse('2024-01-01'),
       endDate: DateTime.parse('2024-02-01'),
       isActive: true,
+      subscriptionStatus: 'ACTIVE',
       daysRemaining: 31,
     );
 
@@ -90,6 +93,7 @@ void main() {
         maxTeamMembers: 2,
         features: [testFeature],
         isActive: true,
+        subscriptionStatus: 'ACTIVE',
       );
 
       final basicSubscription = Subscription(
@@ -98,6 +102,7 @@ void main() {
         startDate: DateTime.parse('2024-01-01'),
         endDate: DateTime.parse('2024-02-01'),
         isActive: true,
+        subscriptionStatus: 'ACTIVE',
         daysRemaining: 31,
       );
 
