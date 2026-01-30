@@ -3,6 +3,32 @@
 ## Overview
 This document tracks progress on the monorepo package extraction and architectural redesign.
 
+## 2026-01-31 Session
+
+### Task: Staging Environment, Auth Refactor, and Subscription Improvements
+
+**Objective**: Implement staging environment, refactor authentication to Google SSO only, and improve subscription plan UI.
+
+### Completed Steps:
+- [x] **Staging Environment Implementation**:
+  - Implementation of `.env.staging` and `.env.prod`.
+  - Added `EnvironmentConfig` and `main.dart` flavor support.
+  - Configured `launch.json` and Android Studio configs.
+- [x] **Auth Refactor (Google SSO Only)**:
+  - Removed legacy email/password auth flows.
+  - Updated `AuthRepository` and `AuthRemoteDataSource`.
+  - Simplified `LoginPage` and `ProfilePage`.
+- [x] **Subscription Status (Coming Soon)**:
+  - Added `subscriptionStatus` field to `Plan` entity.
+  - Updated UI to show "Coming Soon" for future plans.
+  - Verified with comprehensive tests.
+- [x] **Bug Fixes**:
+  - Fixed splash screen environment loading.
+  - Redirected legacy routes.
+
+- **Commit**: `1486b3c` - feat: Implement Coming Soon status for subscription plans
+- **Commit**: `[Previous]` - feat: Refactor Auth to Google SSO Only and Implement Staging Environment
+
 ## 2025-12-28 Session
 
 ### Task: Codebase Improvement (Performance Optimization)
