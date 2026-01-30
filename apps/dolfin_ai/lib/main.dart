@@ -15,6 +15,7 @@ import 'firebase_options.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/navigation/navigator_service.dart';
 import 'core/widgets/app_lock_wrapper.dart';
+import 'core/config/environment.dart';
 import 'package:get_it/get_it.dart';
 import 'package:dolfin_ui_kit/theme/app_theme.dart';
 import 'package:dolfin_ui_kit/theme/theme_cubit.dart';
@@ -49,7 +50,7 @@ import 'package:feature_auth/presentation/pages/update_profile_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: EnvironmentConfig.fileName);
 
   AppNetworkConfig.init();
 
@@ -179,8 +180,27 @@ class MyApp extends StatelessWidget {
               theme: AppTheme.lightTheme(),
               darkTheme: AppTheme.darkTheme(),
               themeMode: themeMode,
-              builder: (context, child) =>
-                  AppLockWrapper(child: child ?? const SizedBox()),
+              builder: (context, child) {
+                final wrappedChild =
+                    AppLockWrapper(child: child ?? const SizedBox());
+
+                if (EnvironmentConfig.isStaging) {
+                  return Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Banner(
+                      message: 'STAGING',
+                      location: BannerLocation.topStart,
+                      color: Colors.orange,
+                      textStyle: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                      child: wrappedChild,
+                    ),
+                  );
+                }
+                return wrappedChild;
+              },
               home: const SplashPage(),
               routes: {
                 '/onboarding': (context) => const OnboardingPage(),
