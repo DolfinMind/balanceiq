@@ -40,6 +40,7 @@ class Plan extends Equatable {
   final int maxTeamMembers;
   final List<Feature> features;
   final bool isActive;
+  final String subscriptionStatus;
 
   const Plan({
     required this.id,
@@ -55,6 +56,7 @@ class Plan extends Equatable {
     required this.maxTeamMembers,
     required this.features,
     required this.isActive,
+    required this.subscriptionStatus,
   });
 
   @override
@@ -72,6 +74,7 @@ class Plan extends Equatable {
         maxTeamMembers,
         features,
         isActive,
+        subscriptionStatus,
       ];
 
   /// Format price with currency symbol
@@ -82,4 +85,7 @@ class Plan extends Equatable {
 
   /// Check if plan is yearly
   bool get isYearly => billingCycle == 'YEARLY';
+
+  /// Check if plan is coming soon
+  bool get isComingSoon => subscriptionStatus == 'COMING_SOON';
 }

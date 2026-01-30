@@ -47,6 +47,7 @@ class PlanDto {
   final int maxTeamMembers;
   final List<FeatureDto> features;
   final bool isActive;
+  final String subscriptionStatus;
 
   PlanDto({
     required this.id,
@@ -62,6 +63,7 @@ class PlanDto {
     required this.maxTeamMembers,
     required this.features,
     required this.isActive,
+    required this.subscriptionStatus,
   });
 
   factory PlanDto.fromJson(Map<String, dynamic> json) {
@@ -82,6 +84,7 @@ class PlanDto {
               .toList() ??
           [],
       isActive: json['isActive'] as bool? ?? true,
+      subscriptionStatus: json['subscriptionStatus'] as String? ?? 'ACTIVE',
     );
   }
 }

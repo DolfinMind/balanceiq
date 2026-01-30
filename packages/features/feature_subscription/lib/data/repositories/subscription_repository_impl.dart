@@ -99,6 +99,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
               ))
           .toList(),
       isActive: dto.isActive,
+      subscriptionStatus: dto.subscriptionStatus,
     );
   }
 
