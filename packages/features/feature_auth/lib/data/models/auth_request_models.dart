@@ -41,10 +41,28 @@ class LoginData {
 
   factory LoginData.fromJson(Map<String, dynamic> json) {
     return LoginData(
-      accessToken: json['accessToken'] as String? ?? '',
+      accessToken:
+          json['token'] as String? ?? json['accessToken'] as String? ?? '',
       refreshToken: json['refreshToken'] as String? ?? '',
-      user: UserInfo.fromJson(json['user'] as Map<String, dynamic>),
-      appCode: json['appCode'] as String? ?? '',
+      user: UserInfo(
+        id: json['userId']?.toString() ?? json['user']?['id']?.toString() ?? '',
+        email:
+            json['email'] as String? ?? json['user']?['email'] as String? ?? '',
+        fullName: json['fullName'] as String? ??
+            json['user']?['fullName'] as String? ??
+            '',
+        avatarUrl: json['avatarUrl'] as String? ??
+            json['user']?['avatarUrl'] as String?,
+        authProvider: json['authProvider'] as String? ??
+            json['user']?['authProvider'] as String?,
+        currency:
+            json['currency'] as String? ?? json['user']?['currency'] as String?,
+        isEmailVerified: json['isEmailVerified'] as bool? ??
+            json['user']?['isEmailVerified'] as bool? ??
+            false,
+      ),
+      appCode: json['appCode'] as String? ??
+          'FINANCE_GURU', // Default as it's missing in response
       isNewUser: json['isNewUser'] as bool? ?? false,
     );
   }
