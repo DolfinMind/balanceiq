@@ -350,27 +350,30 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
                 ),
                 const SizedBox(height: 16),
                 // Price
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '\$${displayPrice.toStringAsFixed(0)}',
-                      style: AppTypography.displayLarge.copyWith(
-                        color: Theme.of(context).textTheme.displayLarge?.color,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Text(
-                        GetIt.I<SubscriptionStrings>().perMonth,
-                        style: AppTypography.bodyLarge.copyWith(
-                          color: Theme.of(context).hintColor,
+                if (!plan.isComingSoon) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '\$${displayPrice.toStringAsFixed(0)}',
+                        style: AppTypography.displayLarge.copyWith(
+                          color:
+                              Theme.of(context).textTheme.displayLarge?.color,
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 4),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(
+                          GetIt.I<SubscriptionStrings>().perMonth,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: Theme.of(context).hintColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 24),
                 // Features
                 ...plan.features.take(4).map((feature) => Padding(
