@@ -18,8 +18,8 @@ class ApiEndpoints {
   static String get agentBaseUrl => _agentBaseUrl;
 
   // Authentication APIs
-  static String get googleOAuth => '$backendBaseUrl/api/sso/google';
-  static String get refreshToken => '$backendBaseUrl/api/sso/refresh-token';
+  static String get googleOAuth => '$authBaseUrl/oauth2/google';
+  static String get refreshToken => '$authBaseUrl/refresh-token';
   static String get getProfile =>
       '$authBaseUrl/profile'; // Keeping for now if needed, or remove? Prompt implied only new SSO endpoints. Assuming old auth API is gone.
   // Actually, the prompt says "Removed deprecated endpoints: /api/auth/signup, /api/auth/login, etc."

@@ -58,7 +58,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ApiEndpoints.googleOAuth,
         data: {
           'idToken': idToken,
-          'appCode': 'ECHO_MEMORY',
+          'appCode': 'FINANCE_GURU',
         },
         options: Options(
           headers: {'Content-Type': 'application/json'},

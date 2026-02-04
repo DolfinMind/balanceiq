@@ -140,7 +140,8 @@ class RefreshTokenData {
 
   factory RefreshTokenData.fromJson(Map<String, dynamic> json) {
     return RefreshTokenData(
-      accessToken: json['accessToken'] as String? ?? '',
+      accessToken:
+          json['token'] as String? ?? json['accessToken'] as String? ?? '',
       refreshToken: json['refreshToken'] as String? ?? '',
     );
   }
