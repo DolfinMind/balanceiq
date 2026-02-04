@@ -18,6 +18,8 @@ class DashboardTourController {
   TutorialCoachMark? _tutorialCoachMark;
   bool _tourShown = false;
 
+  bool _isDisposing = false; // Add this flag
+
   DashboardTourController({
     required this.context,
     required this.profileIconKey,
@@ -25,11 +27,12 @@ class DashboardTourController {
 
   /// Show the profile icon tour if conditions are met.
   void showProfileIconTour() {
-    if (_tourShown) return;
+    if (_tourShown || _isDisposing) return; // Check flag
 
     if (profileIconKey.currentContext == null) {
+      if (_isDisposing) return; // Check flag before delayed task
       Future.delayed(const Duration(milliseconds: 500), () {
-        showProfileIconTour();
+        if (!_isDisposing) showProfileIconTour(); // Check flag
       });
       return;
     }
@@ -80,6 +83,8 @@ class DashboardTourController {
         Navigator.pushNamed(context, '/profile');
       },
       onFinish: () {
+        // Prevent navigation if controller is disposing (e.g. logout)
+        if (_isDisposing) return;
         tourCubit.onProfileIconTapped();
         Navigator.pushNamed(context, '/profile');
       },
@@ -89,7 +94,9 @@ class DashboardTourController {
       },
     );
 
-    _tutorialCoachMark!.show(context: context);
+    if (!_isDisposing) {
+      _tutorialCoachMark!.show(context: context);
+    }
   }
 
   /// Check initial dashboard state and trigger tour if needed.
@@ -101,7 +108,7 @@ class DashboardTourController {
     tourCubit.checkAndStartTourIfNeeded(isOnboarded: isOnboarded);
 
     Future.delayed(const Duration(milliseconds: 500), () {
-      if (tourCubit.isAtStep(TourStep.dashboardProfileIcon)) {
+      if (!_isDisposing && tourCubit.isAtStep(TourStep.dashboardProfileIcon)) {
         showProfileIconTour();
       }
     });
@@ -111,6 +118,7 @@ class DashboardTourController {
 
   /// Dispose of the tutorial coach mark.
   void dispose() {
+    _isDisposing = true;
     _tutorialCoachMark?.finish();
   }
 }
