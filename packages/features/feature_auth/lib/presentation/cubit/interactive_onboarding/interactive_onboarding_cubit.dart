@@ -68,7 +68,7 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
 
   /// Start playing the salary day story
   Future<void> startStory() async {
-    if (_isPlayingStory) return;
+    if (_isPlayingStory || isClosed) return;
     _isPlayingStory = true;
     _scriptIndex = 0;
 
@@ -82,13 +82,17 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
   }
 
   Future<void> _playNextScriptItem() async {
+    if (isClosed) return;
+
     if (_scriptIndex >= _StoryScript.sequence.length) {
       // Story complete
       _isPlayingStory = false;
-      emit(state.copyWith(
-        storyPlaying: false,
-        storyCompleted: true,
-      ));
+      if (!isClosed) {
+        emit(state.copyWith(
+          storyPlaying: false,
+          storyCompleted: true,
+        ));
+      }
       return;
     }
 
@@ -100,6 +104,7 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
     // Wait for the delay
     await Future.delayed(Duration(milliseconds: delay));
 
+    if (isClosed) return;
     if (!_isPlayingStory) return; // Cancelled
 
     // Add typing indicator for bot messages
@@ -111,9 +116,12 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
         isTyping: true,
         timestamp: DateTime.now(),
       );
-      emit(state.copyWith(messages: [...state.messages, typingMessage]));
+      if (!isClosed) {
+        emit(state.copyWith(messages: [...state.messages, typingMessage]));
+      }
 
       await Future.delayed(const Duration(milliseconds: 800));
+      if (isClosed) return;
       if (!_isPlayingStory) return;
 
       // Replace typing with actual message
@@ -125,7 +133,9 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
         isUser: false,
         timestamp: DateTime.now(),
       );
-      emit(state.copyWith(messages: [...messages, actualMessage]));
+      if (!isClosed) {
+        emit(state.copyWith(messages: [...messages, actualMessage]));
+      }
     } else {
       // User or narrator message
       final message = SimulatedMessage(
@@ -134,7 +144,9 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
         isUser: type == 'user',
         timestamp: DateTime.now(),
       );
-      emit(state.copyWith(messages: [...state.messages, message]));
+      if (!isClosed) {
+        emit(state.copyWith(messages: [...state.messages, message]));
+      }
     }
 
     _scriptIndex++;
@@ -168,7 +180,7 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
 
   /// Handle user practice input
   Future<void> submitPractice(String input) async {
-    if (input.trim().isEmpty) return;
+    if (input.trim().isEmpty || isClosed) return;
 
     emit(state.copyWith(userInput: input));
 
@@ -179,10 +191,13 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
       isUser: true,
       timestamp: DateTime.now(),
     );
-    emit(state.copyWith(messages: [...state.messages, userMessage]));
+    if (!isClosed)
+      emit(state.copyWith(messages: [...state.messages, userMessage]));
 
     // Add typing indicator
     await Future.delayed(const Duration(milliseconds: 300));
+    if (isClosed) return;
+
     final typingMessage = SimulatedMessage(
       id: 'practice_typing',
       content: '',
@@ -190,9 +205,11 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
       isTyping: true,
       timestamp: DateTime.now(),
     );
-    emit(state.copyWith(messages: [...state.messages, typingMessage]));
+    if (!isClosed)
+      emit(state.copyWith(messages: [...state.messages, typingMessage]));
 
     await Future.delayed(const Duration(milliseconds: 1000));
+    if (isClosed) return;
 
     // Replace with bot response
     final messages =
@@ -204,15 +221,19 @@ class InteractiveOnboardingCubit extends Cubit<InteractiveOnboardingState> {
       timestamp: DateTime.now(),
     );
 
-    emit(state.copyWith(
-      messages: [...messages, botResponse],
-      userPracticed: true,
-      showCelebration: true,
-    ));
+    if (!isClosed) {
+      emit(state.copyWith(
+        messages: [...messages, botResponse],
+        userPracticed: true,
+        showCelebration: true,
+      ));
+    }
 
     // Hide celebration after delay
     await Future.delayed(const Duration(milliseconds: 2500));
-    emit(state.copyWith(showCelebration: false));
+    if (!isClosed) {
+      emit(state.copyWith(showCelebration: false));
+    }
   }
 
   String _generatePracticeResponse(String input) {
