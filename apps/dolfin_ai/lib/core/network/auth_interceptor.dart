@@ -8,7 +8,7 @@ import '../navigation/navigator_service.dart';
 import "package:dolfin_core/storage/secure_storage_service.dart";
 import "package:dolfin_core/utils/app_logger.dart";
 
-class AuthInterceptor extends Interceptor {
+class AuthInterceptor extends QueuedInterceptor {
   final SecureStorageService secureStorage;
   final Dio dio; // This should be the main Dio instance to retry the request
 

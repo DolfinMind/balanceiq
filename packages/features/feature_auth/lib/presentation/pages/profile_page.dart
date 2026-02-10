@@ -107,13 +107,10 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   void _showEmailSentModal() {
-    final tourCubit = context.read<ProductTourCubit>();
-
     EmailSentModal.show(
       context,
       onContinue: () {
         Navigator.of(context).pop(); // Close modal
-        tourCubit.acknowledgeEmailSent();
         // Show subscription tour after a delay
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) showSubscriptionTour();

@@ -29,15 +29,8 @@ class SubscriptionPlansPage extends StatelessWidget {
   }
 }
 
-class _SubscriptionPlansView extends StatefulWidget {
+class _SubscriptionPlansView extends StatelessWidget {
   const _SubscriptionPlansView();
-
-  @override
-  State<_SubscriptionPlansView> createState() => _SubscriptionPlansViewState();
-}
-
-class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
-  bool _isMonthly = true;
 
   @override
   Widget build(BuildContext context) {
@@ -84,11 +77,21 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
                     ),
                   );
                 } else {
-                  // Navigate back to profile page
-                  Navigator.popUntil(
-                      context,
-                      (route) =>
-                          route.settings.name == '/profile' || route.isFirst);
+                  // Check if we should return to chat page
+                  final args = ModalRoute.of(context)?.settings.arguments;
+                  final returnToChat = args is Map<String, dynamic> &&
+                      args['returnToChat'] == true;
+
+                  if (returnToChat) {
+                    // Pop back to chat page so .then() callback reloads chat
+                    Navigator.pop(context);
+                  } else {
+                    // Navigate back to profile page
+                    Navigator.popUntil(
+                        context,
+                        (route) =>
+                            route.settings.name == '/profile' || route.isFirst);
+                  }
                 }
               } else if (state is SubscriptionError) {
                 if (context.mounted) {
@@ -151,17 +154,6 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          // Monthly/Yearly Toggle
-          _buildBillingToggle(context),
-          const SizedBox(height: 8),
-          // Savings Text
-          Text(
-            GetIt.I<SubscriptionStrings>().yearlySavings,
-            style: AppTypography.bodyMediumSemiBold.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 32),
           // Plan Cards
           ...sortedPlans.map((plan) => Padding(
                 padding: const EdgeInsets.only(bottom: 20),
@@ -223,73 +215,6 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
     );
   }
 
-  Widget _buildBillingToggle(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildToggleButton(
-              context,
-              GetIt.I<SubscriptionStrings>().monthly,
-              _isMonthly,
-              () => setState(() => _isMonthly = true),
-            ),
-          ),
-          Expanded(
-            child: _buildToggleButton(
-              context,
-              GetIt.I<SubscriptionStrings>().yearly,
-              !_isMonthly,
-              () => setState(() => _isMonthly = false),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToggleButton(
-    BuildContext context,
-    String text,
-    bool isActive,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isActive
-              ? Theme.of(context).colorScheme.surfaceContainer
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: isActive
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: AppTypography.buttonMedium.copyWith(
-            color: isActive
-                ? Theme.of(context).colorScheme.onSurface
-                : Theme.of(context).hintColor,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildPlanCard(
     BuildContext context, {
@@ -297,8 +222,7 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
     required bool isCurrentPlan,
     required bool isPopular,
   }) {
-    // Calculate display price (20% off for yearly)
-    final displayPrice = _isMonthly ? plan.price : plan.price * 0.8;
+    final displayPrice = plan.price;
 
     return Container(
       decoration: BoxDecoration(

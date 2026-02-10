@@ -11,6 +11,7 @@ class MessageBubble extends StatefulWidget {
   final bool isUser;
   final String botName;
   final bool isLastMessage;
+  final VoidCallback? onRetry;
 
   const MessageBubble({
     super.key,
@@ -18,6 +19,7 @@ class MessageBubble extends StatefulWidget {
     required this.isUser,
     required this.botName,
     this.isLastMessage = false,
+    this.onRetry,
   });
 
   @override
@@ -89,7 +91,10 @@ class _MessageBubbleState extends State<MessageBubble>
               children: [
                 // Message bubble
                 widget.isUser
-                    ? UserMessageBubble(message: widget.message)
+                    ? UserMessageBubble(
+                        message: widget.message,
+                        onRetry: widget.onRetry,
+                      )
                     : AiMessageBubble(
                         message: widget.message,
                         botName: widget.botName,

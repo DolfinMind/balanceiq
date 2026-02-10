@@ -49,7 +49,11 @@ class _LoginPageState extends State<LoginPage> {
       listener: (context, state) {
         if (state is LoginSuccess) {
           context.read<SessionCubit>().updateUser(state.user);
-          Navigator.of(context).pushReplacementNamed('/home');
+          if (state.isNewUser) {
+            Navigator.of(context).pushReplacementNamed('/interactive-onboarding');
+          } else {
+            Navigator.of(context).pushReplacementNamed('/home');
+          }
         } else if (state is LoginError) {
           SnackbarUtils.showError(context, state.message);
         }

@@ -395,6 +395,28 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Retry a failed message
+  Future<void> retryMessage(Message failedMessage) async {
+    if (state is ChatLoaded) {
+      final currentState = state as ChatLoaded;
+
+      // Remove the failed message from the list
+      final updatedMessages = currentState.messages
+          .where((m) => m.id != failedMessage.id)
+          .toList();
+
+      emit(currentState.copyWith(messages: updatedMessages));
+
+      // Re-send the message
+      await sendNewMessage(
+        botId: failedMessage.botId,
+        content: failedMessage.content,
+        imagePath: failedMessage.imageUrl,
+        audioPath: failedMessage.audioUrl,
+      );
+    }
+  }
+
   void clearChat() {
     if (currentBotId != null) {
       emit(ChatLoaded(

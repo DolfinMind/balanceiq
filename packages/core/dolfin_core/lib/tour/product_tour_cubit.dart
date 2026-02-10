@@ -75,29 +75,10 @@ class ProductTourCubit extends Cubit<ProductTourState> {
     final currentState = state as TourActive;
 
     if (currentState.currentStep == TourStep.dashboardProfileIcon) {
-      await advanceToStep(TourStep.profileEmailVerify);
-    }
-  }
-
-  /// Called when user clicks "Send Verification Email"
-  Future<void> onEmailVerificationClicked() async {
-    if (state is! TourActive) return;
-    final currentState = state as TourActive;
-
-    if (currentState.currentStep == TourStep.profileEmailVerify) {
-      await advanceToStep(TourStep.emailSentModal);
-    }
-  }
-
-  /// Called when user dismisses the email sent modal
-  Future<void> acknowledgeEmailSent() async {
-    if (state is! TourActive) return;
-    final currentState = state as TourActive;
-
-    if (currentState.currentStep == TourStep.emailSentModal) {
       await advanceToStep(TourStep.profileSubscription);
     }
   }
+
 
   /// Called when user successfully subscribes to a plan
   Future<void> onSubscriptionCreated() async {

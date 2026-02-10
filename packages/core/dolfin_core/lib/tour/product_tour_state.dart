@@ -8,11 +8,6 @@ enum TourStep {
   /// Step 1: Highlight profile icon on dashboard
   dashboardProfileIcon,
 
-  /// Step 2: Highlight email verification banner on profile page
-  profileEmailVerify,
-
-  /// Step 2b: Show modal to open mail app after verification email sent
-  emailSentModal,
 
   /// Step 3: Highlight subscription card on profile page
   profileSubscription,
