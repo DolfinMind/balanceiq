@@ -69,11 +69,11 @@ class _InteractiveOnboardingPageState extends State<InteractiveOnboardingPage> {
   }
 
   void _skipOnboarding() {
-    Navigator.pushReplacementNamed(context, '/home');
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   void _completeOnboarding() {
-    Navigator.pushReplacementNamed(context, '/home');
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
