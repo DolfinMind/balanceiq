@@ -42,7 +42,7 @@ android {
 
     defaultConfig {
         applicationId = "com.dolfinmind.balance_iq"
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
