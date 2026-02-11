@@ -89,7 +89,10 @@ class LoginCubit extends Cubit<LoginState> {
               id: userInfo.id.toString(),
               email: userInfo.email,
               name: userInfo.fullName,
-              photoUrl: userInfo.avatarUrl,
+              photoUrl:
+                  (userInfo.avatarUrl != null && userInfo.avatarUrl!.isNotEmpty)
+                      ? userInfo.avatarUrl
+                      : googleUser.photoUrl,
               currency: userInfo.currency,
               authProvider: googleUser.authProvider,
               createdAt: googleUser.createdAt,

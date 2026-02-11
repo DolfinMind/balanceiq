@@ -172,7 +172,10 @@ class SessionCubit extends Cubit<SessionState> {
           id: userInfo.id.toString(),
           email: userInfo.email,
           name: userInfo.fullName,
-          photoUrl: userInfo.avatarUrl,
+          photoUrl:
+              (userInfo.avatarUrl != null && userInfo.avatarUrl!.isNotEmpty)
+                  ? userInfo.avatarUrl
+                  : currentUser?.photoUrl,
           currency: userInfo.currency,
           // If authProvider not in userInfo, fallback to current user's provider or 'email'
           authProvider: currentUser?.authProvider ?? 'email',
@@ -260,7 +263,10 @@ class SessionCubit extends Cubit<SessionState> {
           id: userInfo.id.toString(),
           email: userInfo.email,
           name: userInfo.fullName,
-          photoUrl: userInfo.avatarUrl,
+          photoUrl:
+              (userInfo.avatarUrl != null && userInfo.avatarUrl!.isNotEmpty)
+                  ? userInfo.avatarUrl
+                  : currentUser!.photoUrl,
           currency: userInfo.currency,
           authProvider: currentUser!.authProvider,
           createdAt: currentUser.createdAt,
