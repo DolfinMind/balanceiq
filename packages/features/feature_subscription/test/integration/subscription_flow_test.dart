@@ -46,7 +46,6 @@ void main() {
       category: 'CORE',
       requiresPermission: false,
       isActive: true,
-      subscriptionStatus: 'ACTIVE',
     );
 
     final testPlanDto = PlanDto(
@@ -72,7 +71,6 @@ void main() {
       startDate: DateTime.parse('2024-01-01'),
       endDate: DateTime.parse('2024-02-01'),
       isActive: true,
-      subscriptionStatus: 'ACTIVE',
       daysRemaining: 31,
     );
 

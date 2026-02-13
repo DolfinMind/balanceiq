@@ -11,7 +11,6 @@ void main() {
       category: 'CORE',
       requiresPermission: false,
       isActive: true,
-      subscriptionStatus: 'ACTIVE',
     );
 
     group('formattedPrice', () {

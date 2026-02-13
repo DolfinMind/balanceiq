@@ -53,7 +53,6 @@ void main() {
       category: 'CORE',
       requiresPermission: false,
       isActive: true,
-      subscriptionStatus: 'ACTIVE',
     );
 
     const testPlan = Plan(
@@ -81,7 +80,6 @@ void main() {
       startDate: DateTime(2024, 1, 1),
       endDate: DateTime(2024, 2, 1),
       isActive: true,
-      subscriptionStatus: 'ACTIVE',
       daysRemaining: 30,
     );
 
@@ -667,7 +665,6 @@ void main() {
           startDate: DateTime(2024, 1, 1),
           endDate: DateTime(2024, 1, 8),
           isActive: true,
-          subscriptionStatus: 'ACTIVE',
           daysRemaining: 5,
         );
         expect(expiringSoonSubscription.isExpiringSoon, isTrue);
