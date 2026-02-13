@@ -123,18 +123,28 @@
       "name": "flutter_test",
       "version": "0.0.0",
       "dependencies": [
+        "async",
+        "boolean_selector",
+        "characters",
         "clock",
         "collection",
         "fake_async",
         "flutter",
+        "leak_tracker",
         "leak_tracker_flutter_testing",
+        "leak_tracker_testing",
         "matcher",
+        "material_color_utilities",
         "meta",
         "path",
+        "source_span",
         "stack_trace",
         "stream_channel",
+        "string_scanner",
+        "term_glyph",
         "test_api",
-        "vector_math"
+        "vector_math",
+        "vm_service"
       ]
     },
     {
@@ -447,6 +457,16 @@
       ]
     },
     {
+      "name": "sqflite_sqlcipher",
+      "version": "3.3.0",
+      "dependencies": [
+        "flutter",
+        "path",
+        "sqflite_common",
+        "synchronized"
+      ]
+    },
+    {
       "name": "http_certificate_pinning",
       "version": "3.0.1",
       "dependencies": [
@@ -543,7 +563,7 @@
     },
     {
       "name": "meta",
-      "version": "1.17.0",
+      "version": "1.16.0",
       "dependencies": []
     },
     {
@@ -560,7 +580,7 @@
     },
     {
       "name": "test_api",
-      "version": "0.7.7",
+      "version": "0.7.4",
       "dependencies": [
         "async",
         "boolean_selector",
@@ -595,6 +615,23 @@
       "dependencies": []
     },
     {
+      "name": "vm_service",
+      "version": "15.0.0",
+      "dependencies": []
+    },
+    {
+      "name": "term_glyph",
+      "version": "1.2.2",
+      "dependencies": []
+    },
+    {
+      "name": "string_scanner",
+      "version": "1.4.1",
+      "dependencies": [
+        "source_span"
+      ]
+    },
+    {
       "name": "stream_channel",
       "version": "2.1.4",
       "dependencies": [
@@ -602,8 +639,65 @@
       ]
     },
     {
+      "name": "source_span",
+      "version": "1.10.1",
+      "dependencies": [
+        "collection",
+        "path",
+        "term_glyph"
+      ]
+    },
+    {
+      "name": "material_color_utilities",
+      "version": "0.11.1",
+      "dependencies": [
+        "collection"
+      ]
+    },
+    {
+      "name": "leak_tracker_testing",
+      "version": "3.0.1",
+      "dependencies": [
+        "leak_tracker",
+        "matcher",
+        "meta"
+      ]
+    },
+    {
+      "name": "leak_tracker",
+      "version": "10.0.9",
+      "dependencies": [
+        "clock",
+        "collection",
+        "meta",
+        "path",
+        "vm_service"
+      ]
+    },
+    {
+      "name": "characters",
+      "version": "1.4.0",
+      "dependencies": []
+    },
+    {
+      "name": "boolean_selector",
+      "version": "2.1.2",
+      "dependencies": [
+        "source_span",
+        "string_scanner"
+      ]
+    },
+    {
+      "name": "async",
+      "version": "2.13.0",
+      "dependencies": [
+        "collection",
+        "meta"
+      ]
+    },
+    {
       "name": "leak_tracker_flutter_testing",
-      "version": "3.0.10",
+      "version": "3.0.9",
       "dependencies": [
         "flutter",
         "leak_tracker",
@@ -614,7 +708,7 @@
     },
     {
       "name": "vector_math",
-      "version": "2.2.0",
+      "version": "2.1.4",
       "dependencies": []
     },
     {
@@ -764,14 +858,6 @@
         "source_span",
         "string_scanner",
         "typed_data"
-      ]
-    },
-    {
-      "name": "async",
-      "version": "2.13.0",
-      "dependencies": [
-        "collection",
-        "meta"
       ]
     },
     {
@@ -1114,16 +1200,20 @@
       "dependencies": []
     },
     {
-      "name": "material_color_utilities",
-      "version": "0.11.1",
+      "name": "local_auth_windows",
+      "version": "1.0.11",
       "dependencies": [
-        "collection"
+        "flutter",
+        "local_auth_platform_interface"
       ]
     },
     {
-      "name": "characters",
-      "version": "1.4.0",
-      "dependencies": []
+      "name": "local_auth_platform_interface",
+      "version": "1.1.0",
+      "dependencies": [
+        "flutter",
+        "plugin_platform_interface"
+      ]
     },
     {
       "name": "google_sign_in_web",
@@ -1252,7 +1342,12 @@
       "name": "flutter_web_plugins",
       "version": "0.0.0",
       "dependencies": [
-        "flutter"
+        "characters",
+        "collection",
+        "flutter",
+        "material_color_utilities",
+        "meta",
+        "vector_math"
       ]
     },
     {
@@ -1299,44 +1394,6 @@
       "dependencies": [
         "flutter",
         "flutter_secure_storage_platform_interface"
-      ]
-    },
-    {
-      "name": "term_glyph",
-      "version": "1.2.2",
-      "dependencies": []
-    },
-    {
-      "name": "string_scanner",
-      "version": "1.4.1",
-      "dependencies": [
-        "source_span"
-      ]
-    },
-    {
-      "name": "source_span",
-      "version": "1.10.1",
-      "dependencies": [
-        "collection",
-        "path",
-        "term_glyph"
-      ]
-    },
-    {
-      "name": "boolean_selector",
-      "version": "2.1.2",
-      "dependencies": [
-        "source_span",
-        "string_scanner"
-      ]
-    },
-    {
-      "name": "leak_tracker_testing",
-      "version": "3.0.2",
-      "dependencies": [
-        "leak_tracker",
-        "matcher",
-        "meta"
       ]
     },
     {
@@ -1606,34 +1663,8 @@
       ]
     },
     {
-      "name": "sqflite_sqlcipher",
-      "version": "3.4.0",
-      "dependencies": [
-        "flutter",
-        "path",
-        "sqflite_common",
-        "synchronized"
-      ]
-    },
-    {
-      "name": "leak_tracker",
-      "version": "11.0.2",
-      "dependencies": [
-        "clock",
-        "collection",
-        "meta",
-        "path",
-        "vm_service"
-      ]
-    },
-    {
-      "name": "vm_service",
-      "version": "15.0.0",
-      "dependencies": []
-    },
-    {
       "name": "local_auth_darwin",
-      "version": "1.6.1",
+      "version": "1.6.0",
       "dependencies": [
         "flutter",
         "intl",
@@ -1641,24 +1672,8 @@
       ]
     },
     {
-      "name": "local_auth_platform_interface",
-      "version": "1.1.0",
-      "dependencies": [
-        "flutter",
-        "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "local_auth_windows",
-      "version": "1.0.11",
-      "dependencies": [
-        "flutter",
-        "local_auth_platform_interface"
-      ]
-    },
-    {
       "name": "local_auth_android",
-      "version": "1.0.56",
+      "version": "1.0.52",
       "dependencies": [
         "flutter",
         "flutter_plugin_android_lifecycle",
@@ -1676,7 +1691,7 @@
     },
     {
       "name": "test",
-      "version": "1.26.3",
+      "version": "1.25.15",
       "dependencies": [
         "analyzer",
         "async",
@@ -1708,7 +1723,7 @@
     },
     {
       "name": "test_core",
-      "version": "0.6.12",
+      "version": "0.6.8",
       "dependencies": [
         "analyzer",
         "args",
