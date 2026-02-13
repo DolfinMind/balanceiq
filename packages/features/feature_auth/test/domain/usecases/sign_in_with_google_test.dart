@@ -31,7 +31,7 @@ void main() {
     test('should return User when Google sign in is successful', () async {
       // Arrange
       when(() => mockAuthRepository.signInWithGoogle())
-          .thenAnswer((_) async => Right(tUser));
+          .thenAnswer((_) async => Right((user: tUser, isNewUser: false)));
 
       // Act
       final result = await signInWithGoogle();
@@ -41,9 +41,9 @@ void main() {
       result.fold(
         (l) => fail('test failed'),
         (r) {
-          expect(r.email, tUser.email);
-          expect(r.name, tUser.name);
-          expect(r.authProvider, tUser.authProvider);
+          expect(r.user.email, tUser.email);
+          expect(r.user.name, tUser.name);
+          expect(r.user.authProvider, tUser.authProvider);
         },
       );
       verify(() => mockAuthRepository.signInWithGoogle()).called(1);

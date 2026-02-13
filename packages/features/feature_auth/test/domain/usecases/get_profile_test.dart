@@ -44,12 +44,10 @@ void main() {
         () async {
       // Arrange
       final userInfoNoPhoto = UserInfo(
-        id: 1,
-        username: 'testuser',
+        id: '1',
         email: 'test@example.com',
         fullName: 'Test User',
-        photoUrl: null,
-        roles: ['USER'],
+        avatarUrl: null,
         isEmailVerified: true,
       );
 

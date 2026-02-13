@@ -95,16 +95,20 @@ void main() {
     });
   });
 
-  group('logout', () {
+  group('signOut', () {
     test('should perform a POST request to the logout endpoint', () async {
       // Arrange
+      when(() => mockGoogleSignIn.signOut()).thenAnswer((_) async => null);
+      when(() => mockSecureStorage.clearAllTokens())
+          .thenAnswer((_) async => null);
+
       when(() => mockDio.post(
             any(),
             options: any(named: 'options'),
           )).thenAnswer((_) async => MockResponse());
 
       // Act
-      await dataSource.logout();
+      await dataSource.signOut();
 
       // Assert
       verify(() => mockDio.post(
@@ -113,9 +117,12 @@ void main() {
           )).called(1);
     });
 
-    test('should throw ServerException when the call is unsuccessful',
-        () async {
+    test('should suppress backend errors and complete successfully', () async {
       // Arrange
+      when(() => mockGoogleSignIn.signOut()).thenAnswer((_) async => null);
+      when(() => mockSecureStorage.clearAllTokens())
+          .thenAnswer((_) async => null);
+
       when(() => mockDio.post(
             any(),
             options: any(named: 'options'),
@@ -130,10 +137,12 @@ void main() {
       ));
 
       // Act
-      final call = dataSource.logout;
+      final call = dataSource.signOut;
 
       // Assert
-      expect(() => call(), throwsA(isA<ServerException>()));
+      await expectLater(call(), completes);
+      verify(() => mockGoogleSignIn.signOut()).called(1);
+      verify(() => mockSecureStorage.clearAllTokens()).called(1);
     });
   });
 }
