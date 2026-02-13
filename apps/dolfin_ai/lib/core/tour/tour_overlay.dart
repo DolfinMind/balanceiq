@@ -43,22 +43,7 @@ class TourOverlay extends StatelessWidget {
           onSkip: () => context.read<ProductTourCubit>().skipTour(),
           showSkip: true,
         );
-      case TourStep.profileEmailVerify:
-        return _TourCard(
-          title: 'Verify Your Email ✉️',
-          description:
-              'Tap the "Verify Email" button to receive a verification link. This helps secure your account.',
-          arrowPosition: ArrowPosition.top,
-          buttonText: 'Next',
-          onButtonPressed: () {
-            context.read<ProductTourCubit>().onEmailVerificationClicked();
-          },
-          onSkip: () => context.read<ProductTourCubit>().skipTour(),
-          showSkip: true,
-        );
-      case TourStep.emailSentModal:
-        // This step is handled by EmailSentModal separately
-        return const SizedBox.shrink();
+
       case TourStep.profileSubscription:
         return _TourCard(
           title: 'Choose Your Plan 💳',

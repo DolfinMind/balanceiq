@@ -18,7 +18,7 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<Either<Failure, User>> signInWithGoogle() async {
+  Future<Either<Failure, ({User user, bool isNewUser})>> signInWithGoogle() async {
     try {
       final loginResponse = await remoteDataSource.signInWithGoogle();
 
@@ -49,8 +49,8 @@ class AuthRepositoryImpl implements AuthRepository {
         // 3. Save User Locally
         await localDataSource.saveUser(userModel);
 
-        // 4. Return Domain User
-        return Right(User(
+        // 4. Return Domain User with isNewUser flag
+        final user = User(
           id: userModel.id,
           email: userModel.email,
           name: userModel.name,
@@ -59,7 +59,8 @@ class AuthRepositoryImpl implements AuthRepository {
           createdAt: userModel.createdAt,
           isEmailVerified: userModel.isEmailVerified,
           currency: userModel.currency,
-        ));
+        );
+        return Right((user: user, isNewUser: data.isNewUser));
       } else {
         return Left(AuthFailure(loginResponse.message));
       }

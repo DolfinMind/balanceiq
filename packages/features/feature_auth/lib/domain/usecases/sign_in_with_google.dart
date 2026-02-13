@@ -8,7 +8,7 @@ class SignInWithGoogle {
 
   SignInWithGoogle(this.repository);
 
-  Future<Either<Failure, User>> call() async {
+  Future<Either<Failure, ({User user, bool isNewUser})>> call() async {
     return await repository.signInWithGoogle();
   }
 }

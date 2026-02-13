@@ -68,7 +68,37 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        final loginResponse = LoginResponse.fromJson(response.data);
+        var loginResponse = LoginResponse.fromJson(response.data);
+
+        // Inject photoUrl from Google account if missing from backend
+        if (loginResponse.data != null && account.photoUrl != null) {
+          final userData = loginResponse.data!.user;
+          if (userData.avatarUrl == null || userData.avatarUrl!.isEmpty) {
+            final updatedUser = UserInfo(
+              id: userData.id,
+              email: userData.email,
+              fullName: userData.fullName,
+              avatarUrl: account.photoUrl,
+              authProvider: userData.authProvider,
+              currency: userData.currency,
+              isEmailVerified: userData.isEmailVerified,
+            );
+
+            final updatedData = LoginData(
+              accessToken: loginResponse.data!.accessToken,
+              refreshToken: loginResponse.data!.refreshToken,
+              user: updatedUser,
+              appCode: loginResponse.data!.appCode,
+              isNewUser: loginResponse.data!.isNewUser,
+            );
+
+            loginResponse = LoginResponse(
+              success: loginResponse.success,
+              message: loginResponse.message,
+              data: updatedData,
+            );
+          }
+        }
 
         // Store the tokens in SecureStorage
         if (loginResponse.data != null) {

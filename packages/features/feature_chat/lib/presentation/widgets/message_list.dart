@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import '../../domain/entities/message.dart';
 import 'package:dolfin_core/constants/app_constants.dart';
+import '../cubit/chat_cubit.dart';
 import 'message_bubble.dart';
 import 'typing_indicator.dart';
 
@@ -98,6 +100,11 @@ class MessageList extends StatelessWidget {
                       isUser: isUser,
                       botName: botName,
                       isLastMessage: isLastMessage,
+                      onRetry: (isUser && message.hasError)
+                          ? () => context
+                              .read<ChatCubit>()
+                              .retryMessage(message)
+                          : null,
                     );
                   }
                   return null;
@@ -116,6 +123,11 @@ class MessageList extends StatelessWidget {
                     isUser: isUser,
                     botName: botName,
                     isLastMessage: isLastMessage,
+                    onRetry: (isUser && message.hasError)
+                        ? () => context
+                            .read<ChatCubit>()
+                            .retryMessage(message)
+                        : null,
                   );
                 }
                 return null;

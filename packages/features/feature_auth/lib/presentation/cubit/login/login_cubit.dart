@@ -21,9 +21,10 @@ class LoginLoading extends LoginState {}
 
 class LoginSuccess extends LoginState {
   final User user;
-  const LoginSuccess(this.user);
+  final bool isNewUser;
+  const LoginSuccess(this.user, {this.isNewUser = false});
   @override
-  List<Object?> get props => [user];
+  List<Object?> get props => [user, isNewUser];
 }
 
 class LoginError extends LoginState {
@@ -57,7 +58,10 @@ class LoginCubit extends Cubit<LoginState> {
 
     await result.fold(
       (failure) async => emit(LoginError(failure.message)),
-      (googleUser) async {
+      (signInResult) async {
+        final googleUser = signInResult.user;
+        final isNewUser = signInResult.isNewUser;
+
         // Log login event
         await analyticsService.logEvent(
           name: 'login',
@@ -74,7 +78,7 @@ class LoginCubit extends Cubit<LoginState> {
           await profileResult.fold((failure) {
             // If profile fetch fails, still proceed with googleUser
             // but maybe log the error
-            emit(LoginSuccess(googleUser));
+            emit(LoginSuccess(googleUser, isNewUser: isNewUser));
           }, (userInfo) async {
             // Sync currency
             if (userInfo.currency != null && userInfo.currency!.isNotEmpty) {
@@ -85,7 +89,10 @@ class LoginCubit extends Cubit<LoginState> {
               id: userInfo.id.toString(),
               email: userInfo.email,
               name: userInfo.fullName,
-              photoUrl: userInfo.avatarUrl,
+              photoUrl:
+                  (userInfo.avatarUrl != null && userInfo.avatarUrl!.isNotEmpty)
+                      ? userInfo.avatarUrl
+                      : googleUser.photoUrl,
               currency: userInfo.currency,
               authProvider: googleUser.authProvider,
               createdAt: googleUser.createdAt,
@@ -93,10 +100,10 @@ class LoginCubit extends Cubit<LoginState> {
             );
 
             await saveUser(fullUser);
-            emit(LoginSuccess(fullUser));
+            emit(LoginSuccess(fullUser, isNewUser: isNewUser));
           });
         } else {
-          emit(LoginSuccess(googleUser));
+          emit(LoginSuccess(googleUser, isNewUser: isNewUser));
         }
       },
     );

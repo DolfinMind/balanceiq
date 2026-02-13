@@ -5,7 +5,7 @@ import '../../data/models/auth_request_models.dart';
 
 abstract class AuthRepository {
   // OAuth Methods
-  Future<Either<Failure, User>> signInWithGoogle();
+  Future<Either<Failure, ({User user, bool isNewUser})>> signInWithGoogle();
   Future<Either<Failure, void>> signOut();
   Future<Either<Failure, User?>> getCurrentUser();
   Future<Either<Failure, bool>> isSignedIn();

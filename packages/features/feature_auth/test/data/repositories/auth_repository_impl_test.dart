@@ -77,8 +77,9 @@ void main() {
       result.fold(
         (l) => fail('Should be Right'),
         (r) {
-          expect(r.email, tUserModel.email);
-          expect(r.authProvider, 'google');
+          expect(r.user.email, tUserModel.email);
+          expect(r.user.authProvider, 'google');
+          expect(r.isNewUser, false);
         },
       );
 
