@@ -18,7 +18,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.dolfinmind.balance_iq"
+    namespace = "com.dolfinmind.dolfinai"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "29.0.14206865"
 
@@ -31,6 +31,20 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
+    flavorDimensions += "env"
+    productFlavors {
+        create("staging") {
+            dimension = "env"
+            applicationId = "com.dolfinmind.dolfinaistaging"
+            resValue "string", "app_name", "Dolfin AI (Staging)"
+        }
+        create("prod") {
+            dimension = "env"
+            applicationId = "com.dolfinmind.dolfinai"
+            resValue "string", "app_name", "Dolfin AI"
+        }
+    }
+
     signingConfigs {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String?
@@ -41,7 +55,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.dolfinmind.balance_iq"
+        // applicationId = "com.dolfinmind.balance_iq"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

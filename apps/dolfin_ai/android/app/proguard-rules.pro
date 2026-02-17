@@ -13,7 +13,7 @@
 -keep class com.google.firebase.** { *; }
 
 # Keep model classes
--keep class com.dolfinmind.balance_iq.** { *; }
+-keep class com.dolfinmind.dolfinai.** { *; }
 
 # Prevent stripping of native libraries
 -keep class * extends androidx.** { *; }
