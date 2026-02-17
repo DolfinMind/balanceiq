@@ -36,12 +36,12 @@ android {
         create("staging") {
             dimension = "env"
             applicationId = "com.dolfinmind.dolfinaistaging"
-            resValue "string", "app_name", "Dolfin AI (Staging)"
+            resValue("string", "app_name", "Dolfin AI (Staging)")
         }
         create("prod") {
             dimension = "env"
             applicationId = "com.dolfinmind.dolfinai"
-            resValue "string", "app_name", "Dolfin AI"
+            resValue("string", "app_name", "Dolfin AI")
         }
     }
 
