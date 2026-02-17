@@ -158,7 +158,15 @@ lib/
 
 **IMPORTANT**: Always use `fvm flutter` instead of just `flutter` to ensure you're using the correct Flutter version (3.27.0).
 
+**Note:** The app requires a flavor (`staging` or `prod`) to run.
+
 ```bash
+# Run Staging Flavor
+fvm flutter run --flavor staging -t lib/main_staging.dart --dart-define=ENV=staging
+
+# Run Production Flavor
+fvm flutter run --flavor prod -t lib/main_prod.dart --dart-define=ENV=prod
+```
 # Check connected devices
 fvm flutter devices
 
