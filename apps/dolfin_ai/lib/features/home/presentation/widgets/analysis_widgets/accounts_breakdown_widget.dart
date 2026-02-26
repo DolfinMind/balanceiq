@@ -1,4 +1,6 @@
 import 'package:balance_iq/core/strings/dashboard_strings.dart';
+import 'package:balance_iq/core/di/injection_container.dart';
+import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +51,7 @@ class AccountsBreakdownWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Total: BDT $total',
+                    'Total: ${sl<CurrencyCubit>().formatAmount(total)}',
                     style: textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.w600,
@@ -234,7 +236,7 @@ class AccountsBreakdownWidget extends StatelessWidget {
                       ),
                     Expanded(
                       child: Text(
-                        'BDT ${(balance)}',
+                        sl<CurrencyCubit>().formatAmount(balance),
                         style: textTheme.titleLarge?.copyWith(
                           color: isNegative
                               ? colorScheme.error
