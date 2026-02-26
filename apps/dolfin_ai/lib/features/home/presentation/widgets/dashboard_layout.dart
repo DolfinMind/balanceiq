@@ -65,7 +65,7 @@ class DashboardLayout extends StatelessWidget {
 
               // --- Dashboard Body ---
               SliverToBoxAdapter(
-                child: const SizedBox(height: 8),
+                child: const SizedBox(height: 16),
               ),
 
               // Balance Card
