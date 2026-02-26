@@ -96,6 +96,33 @@ class DashboardLayout extends StatelessWidget {
                 ),
               ],
 
+              // Category Breakdown (elevated for spending focus)
+              if (summary.categories.isNotEmpty) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CategoryBreakdownWidget(
+                      categories: summary.categories,
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: const SizedBox(height: 16),
+                ),
+              ],
+
+              // Transaction History (elevated for spending focus)
+              SliverToBoxAdapter(
+                child: TransactionHistoryWidget(
+                  onViewAll: onViewAll,
+                  onRefresh: onRefresh,
+                ),
+              ),
+
+              SliverToBoxAdapter(
+                child: const SizedBox(height: 16),
+              ),
+
               // Financial Ratios
               SliverToBoxAdapter(
                 child: Padding(
@@ -123,10 +150,14 @@ class DashboardLayout extends StatelessWidget {
                 ),
               ],
 
-              // Biggest Income & Expense (Grouped for layout coherence)
+              // Biggest Income & Expense
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 120,
+                  ),
                   child: Column(
                     children: [
                       BiggestIncomeWidget(
@@ -142,36 +173,6 @@ class DashboardLayout extends StatelessWidget {
                         account: summary.expenseAccount,
                       ),
                     ],
-                  ),
-                ),
-              ),
-
-              SliverToBoxAdapter(
-                child: const SizedBox(height: 16),
-              ),
-
-              // Category Breakdown
-              if (summary.categories.isNotEmpty) ...[
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: CategoryBreakdownWidget(
-                      categories: summary.categories,
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: const SizedBox(height: 16),
-                ),
-              ],
-
-              // Transaction History
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 120),
-                  child: TransactionHistoryWidget(
-                    onViewAll: onViewAll,
-                    onRefresh: onRefresh,
                   ),
                 ),
               ),
