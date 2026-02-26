@@ -3,7 +3,6 @@ import 'package:balance_iq/core/di/injection_container.dart';
 import 'package:balance_iq/core/strings/dashboard_strings.dart';
 import 'package:balance_iq/core/icons/app_icons.dart';
 import 'package:dolfin_ui_kit/theme/app_palette.dart';
-import 'package:dolfin_ui_kit/widgets/glass_presets.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get_it/get_it.dart';
@@ -25,27 +24,16 @@ class BalanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final currencyCubit = sl<CurrencyCubit>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // Net Balance Section with subtle glow
-          Container(
+          // Net Balance Section — clean, flat
+          Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withValues(alpha: 0.1),
-                  blurRadius: 24,
-                  spreadRadius: 8,
-                ),
-              ],
-            ),
             child: Column(
               children: [
                 Text(
@@ -53,25 +41,18 @@ class BalanceCard extends StatelessWidget {
                   style: textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.5,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 8),
-                ShaderMask(
-                  shaderCallback: (bounds) {
-                    return LinearGradient(colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.secondary,
-                    ]).createShader(bounds);
-                  },
-                  child: Text(
-                    currencyCubit.formatAmount(netBalance),
-                    style: textTheme.displayLarge?.copyWith(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w900,
-                      height: 1.2,
-                      letterSpacing: -1.0,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                Text(
+                  currencyCubit.formatAmount(netBalance),
+                  style: textTheme.displayLarge?.copyWith(
+                    fontSize: 48,
+                    fontWeight: FontWeight.w900,
+                    height: 1.2,
+                    letterSpacing: -1.0,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -79,7 +60,7 @@ class BalanceCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Income and Expense Cards with glassmorphism
+          // Income and Expense Cards — flat containers
           Row(
             children: [
               Expanded(
@@ -121,15 +102,20 @@ class BalanceCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Get semantic colors from your palette
     final iconColor = isIncome
         ? GetIt.instance<AppPalette>().income
         : GetIt.instance<AppPalette>().expense;
 
-    return ThemedGlass.container(
-      context: context,
-      preset: GlassPreset.medium,
+    return Container(
       padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -141,24 +127,12 @@ class BalanceCard extends StatelessWidget {
                 height: 24,
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      iconColor,
-                      iconColor.withValues(alpha: 0.8),
-                    ],
-                  ),
+                  color: iconColor.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: iconColor.withValues(alpha: 0.4),
-                      blurRadius: 8,
-                      spreadRadius: 1,
-                    ),
-                  ],
                 ),
                 child: ColorFiltered(
                   colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onPrimary,
+                    iconColor,
                     BlendMode.srcIn,
                   ),
                   child: iconWidget,
@@ -169,7 +143,7 @@ class BalanceCard extends StatelessWidget {
                 label,
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface.withValues(alpha: 0.8),
+                  color: colorScheme.onSurfaceVariant,
                   letterSpacing: 0.2,
                 ),
               ),
@@ -183,16 +157,6 @@ class BalanceCard extends StatelessWidget {
               fontWeight: FontWeight.w900,
               letterSpacing: -0.8,
               color: colorScheme.onSurface,
-            ),
-          ),
-          // Subtle indicator bar at the bottom for quick visual parsing
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 3,
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(2),
             ),
           ),
         ],
