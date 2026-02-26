@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:balance_iq/core/di/injection_container.dart';
 import 'package:balance_iq/features/home/presentation/pages/transactions_page.dart';
@@ -22,6 +20,7 @@ class CategoryBreakdownWidget extends StatelessWidget {
     }
 
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     final sortedCategories = categories.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
@@ -50,31 +49,23 @@ class CategoryBreakdownWidget extends StatelessWidget {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 7,
+                  horizontal: 12,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    Theme.of(context).colorScheme.primary,
-                    Theme.of(context).colorScheme.secondary,
-                  ]),
+                  color: colorScheme.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(50),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      spreadRadius: 1,
-                    ),
-                  ],
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   '${sortedCategories.length}',
                   style: textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -130,133 +121,88 @@ class CategoryBreakdownWidget extends StatelessWidget {
     required int index,
   }) {
     final textTheme = Theme.of(context).textTheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    final colorScheme = Theme.of(context).colorScheme;
     final accentColor = _getCategoryColor(categoryName, index);
     final icon = _getCategoryIcon(categoryName);
 
     return Container(
       width: 160,
       decoration: BoxDecoration(
-        gradient: isDark
-            ? LinearGradient(
-                colors: [
-                  Theme.of(context).cardColor.withValues(alpha: 0.6),
-                  Theme.of(context).cardColor.withValues(alpha: 0.3),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : LinearGradient(
-                colors: [
-                  Theme.of(context).cardColor,
-                  Theme.of(context).cardColor.withValues(alpha: 0.5),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-        borderRadius: BorderRadius.circular(20),
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Theme.of(context).shadowColor.withValues(alpha: 0.3)
-                : accentColor.withValues(alpha: 0.08),
-            offset: const Offset(0, 4),
-            blurRadius: 12,
-          ),
-        ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-              sigmaX: isDark ? 10 : 0, sigmaY: isDark ? 10 : 0),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            accentColor,
-                            accentColor.withValues(alpha: 0.7),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: accentColor.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        icon,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: accentColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${percentage.toStringAsFixed(0)}%',
-                        style: textTheme.labelSmall?.copyWith(
-                          color: accentColor,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: accentColor,
+                    size: 20,
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      categoryName,
-                      style: textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        letterSpacing: 0.2,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${percentage.toStringAsFixed(0)}%',
+                    style: textTheme.labelSmall?.copyWith(
+                      color: accentColor,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      sl<CurrencyCubit>().formatAmount(amount.abs()),
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
-                        letterSpacing: -0.3,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
-          ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  categoryName,
+                  style: textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    letterSpacing: 0.2,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  sl<CurrencyCubit>().formatAmount(amount.abs()),
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 17,
+                    letterSpacing: -0.3,
+                    color: colorScheme.onSurface,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
