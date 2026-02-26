@@ -1,4 +1,3 @@
-import 'package:dolfin_ui_kit/widgets/glass_presets.dart';
 import 'package:dolfin_ui_kit/theme/theme_cubit.dart';
 import 'package:dolfin_ui_kit/theme/theme_state.dart';
 import 'package:balance_iq/features/home/domain/entities/dashbaord_summary.dart';
@@ -37,6 +36,9 @@ class HomeAppbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return SliverAppBar(
       elevation: 0,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -44,26 +46,31 @@ class HomeAppbar extends StatelessWidget {
       title: InkWell(
         onTap: onTapDateRange,
         borderRadius: BorderRadius.circular(50),
-        child: ThemedGlass.container(
-          context: context,
-          preset: GlassPreset.subtle,
+        child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          borderRadius: 50,
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 displayDate,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.2,
-                    ),
+                style: textTheme.titleMedium?.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
               ),
               const SizedBox(width: 4),
               GetIt.I<AppIcons>().navigation.chevronDown(
                     size: 20,
-                    color: Theme.of(context).textTheme.titleMedium?.color,
+                    color: textTheme.titleMedium?.color,
                   ),
             ],
           ),
@@ -79,27 +86,19 @@ class HomeAppbar extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.secondary,
-                ],
-              ),
+              color: colorScheme.primary,
             ),
             padding: const EdgeInsets.all(3),
             child: profileUrl.isNotEmpty
                 ? CircleAvatar(
                     radius: 16,
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor: colorScheme.primaryContainer,
                     backgroundImage: NetworkImage(profileUrl),
                     onBackgroundImageError: (_, __) {},
                   )
                 : CircleAvatar(
                     radius: 16,
-                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    backgroundColor: colorScheme.primary,
                     child: Text(
                       _getInitial(),
                       style: const TextStyle(
@@ -115,33 +114,34 @@ class HomeAppbar extends StatelessWidget {
       actions: [
         BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
-            // Check actual brightness instead of just theme mode
-            // This properly handles ThemeMode.system
             final isDark = Theme.of(context).brightness == Brightness.dark;
 
-            return ThemedGlass.container(
-              context: context,
-              preset: GlassPreset.subtle,
-              borderRadius: 50,
-              child: InkWell(
-                onTap: () {
-                  context.read<ThemeCubit>().toggleTheme();
-                },
-                borderRadius: BorderRadius.circular(50),
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  alignment: Alignment.center,
-                  child: isDark
-                      ? GetIt.I<AppIcons>().dashboard.lightMode(
-                            size: 20,
-                            color: Theme.of(context).colorScheme.primary,
-                          )
-                      : GetIt.I<AppIcons>().dashboard.darkMode(
-                            size: 20,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+            return InkWell(
+              onTap: () {
+                context.read<ThemeCubit>().toggleTheme();
+              },
+              borderRadius: BorderRadius.circular(50),
+              child: Container(
+                height: 40,
+                width: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerLow,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
+                child: isDark
+                    ? GetIt.I<AppIcons>().dashboard.lightMode(
+                          size: 20,
+                          color: colorScheme.primary,
+                        )
+                    : GetIt.I<AppIcons>().dashboard.darkMode(
+                          size: 20,
+                          color: colorScheme.primary,
+                        ),
               ),
             );
           },
