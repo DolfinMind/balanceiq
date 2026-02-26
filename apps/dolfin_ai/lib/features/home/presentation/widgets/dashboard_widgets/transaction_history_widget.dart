@@ -91,8 +91,8 @@ class TransactionHistoryWidget extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: state.transactions.length > 3
-                    ? 3
+                itemCount: state.transactions.length > 5
+                    ? 5
                     : state.transactions.length,
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 12),
@@ -161,24 +161,15 @@ class TransactionHistoryWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         splashColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
         highlightColor: Theme.of(context).primaryColor.withValues(alpha: 0.05),
-        child: Ink(
+        child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isDark
-                ? colorScheme.surface.withValues(alpha: 0.05)
-                : Colors.white,
+            color: colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? Colors.white10 : Colors.grey.shade200,
+              color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+              width: 1,
             ),
-            boxShadow: [
-              if (!isDark)
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-            ],
           ),
           child: Row(
             children: [
