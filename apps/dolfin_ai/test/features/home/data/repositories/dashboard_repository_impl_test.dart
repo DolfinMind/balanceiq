@@ -39,10 +39,6 @@ void main() {
     netBalance: 40000,
     expenseRatio: 20.0,
     savingsRate: 80.0,
-    incomeTransactions: 5,
-    expenseTransactions: 10,
-    avgIncome: 10000,
-    avgExpense: 1000,
     spendingTrend: [
       SpendingTrendPoint(day: 1, amount: 100, date: DateTime(2025, 12, 1)),
       SpendingTrendPoint(day: 2, amount: 200, date: DateTime(2025, 12, 2)),

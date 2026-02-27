@@ -7,10 +7,6 @@ class DashboardSummaryModel extends DashboardSummary {
     required super.netBalance,
     required super.expenseRatio,
     required super.savingsRate,
-    required super.incomeTransactions,
-    required super.expenseTransactions,
-    required super.avgIncome,
-    required super.avgExpense,
     required super.spendingTrend,
     required super.categories,
     required super.accountsBreakdown,
@@ -126,10 +122,6 @@ class DashboardSummaryModel extends DashboardSummary {
         netBalance: _parseDoubleNullable(json['netBalance']) ?? 0.0,
         expenseRatio: _parseDoubleNullable(json['expenseRatio']) ?? 0.0,
         savingsRate: _parseDoubleNullable(json['savingsRate']) ?? 0.0,
-        incomeTransactions: 0, // Not in API response
-        expenseTransactions: 0, // Not in API response
-        avgIncome: 0.0, // Not in API response
-        avgExpense: 0.0, // Not in API response
         spendingTrend: spendingTrend,
         categories: categories,
         accountsBreakdown: accountsBreakdown,
@@ -183,10 +175,6 @@ class DashboardSummaryModel extends DashboardSummary {
       'net_balance': netBalance,
       'expense_ratio': expenseRatio,
       'savings_rate': savingsRate,
-      'income_transactions': incomeTransactions,
-      'expense_transactions': expenseTransactions,
-      'avg_income': avgIncome,
-      'avg_expense': avgExpense,
       'spending_trend': spendingTrend
           .map((SpendingTrendPoint point) => <String, dynamic>{
                 'day': point.day,

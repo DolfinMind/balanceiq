@@ -21,10 +21,7 @@ class DashboardSummary extends Equatable {
   final double netBalance;
   final double expenseRatio;
   final double savingsRate;
-  final int incomeTransactions;
-  final int expenseTransactions;
-  final double avgIncome;
-  final double avgExpense;
+
   final List<SpendingTrendPoint> spendingTrend;
   final Map<String, double> categories;
   final Map<String, double> accountsBreakdown;
@@ -46,10 +43,6 @@ class DashboardSummary extends Equatable {
     required this.netBalance,
     required this.expenseRatio,
     required this.savingsRate,
-    required this.incomeTransactions,
-    required this.expenseTransactions,
-    required this.avgIncome,
-    required this.avgExpense,
     required this.spendingTrend,
     required this.categories,
     required this.accountsBreakdown,
@@ -73,10 +66,6 @@ class DashboardSummary extends Equatable {
         netBalance,
         expenseRatio,
         savingsRate,
-        incomeTransactions,
-        expenseTransactions,
-        avgIncome,
-        avgExpense,
         spendingTrend,
         categories,
         accountsBreakdown,
