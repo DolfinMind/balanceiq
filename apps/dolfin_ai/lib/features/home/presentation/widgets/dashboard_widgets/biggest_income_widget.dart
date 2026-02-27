@@ -27,8 +27,12 @@ class BiggestIncomeWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.surface.withValues(alpha: 0.7),
+        color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
@@ -37,7 +41,8 @@ class BiggestIncomeWidget extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.green.withValues(alpha: 0.2),
+              color:
+                  GetIt.instance<AppPalette>().income.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: GetIt.I<AppIcons>().dashboard.income(

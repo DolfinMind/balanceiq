@@ -121,7 +121,7 @@ class AccountsBreakdownWidget extends StatelessWidget {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final isNegative = balance < 0;
 
     final accentColor = _getAccentColor(context, accountName, index);
@@ -130,35 +130,12 @@ class AccountsBreakdownWidget extends StatelessWidget {
     return Container(
       width: 180,
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surface.withValues(alpha: 0.05)
-            : colorScheme.surface,
+        color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark
-              ? colorScheme.onSurface.withValues(alpha: 0.1)
-              : colorScheme.onSurface.withValues(alpha: 0.05),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
           width: 1,
         ),
-        boxShadow: [
-          // Neumorphism effect
-          BoxShadow(
-            color: isDark
-                ? Theme.of(context).shadowColor.withValues(alpha: 0.3)
-                : Theme.of(context).shadowColor.withValues(alpha: 0.05),
-            offset: const Offset(4, 4),
-            blurRadius: 8,
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: isDark
-                ? colorScheme.surface.withValues(alpha: 0.05)
-                : colorScheme.surface.withValues(alpha: 0.7),
-            offset: const Offset(-4, -4),
-            blurRadius: 8,
-            spreadRadius: 0,
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
