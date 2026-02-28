@@ -216,7 +216,8 @@ class SpendingTrendChart extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Expanded(
+            SizedBox(
+              height: 200,
               child: LineChart(
                 LineChartData(
                   gridData: const FlGridData(show: false),
