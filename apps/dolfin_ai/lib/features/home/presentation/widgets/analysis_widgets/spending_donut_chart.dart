@@ -93,37 +93,30 @@ class SpendingDonutChart extends StatelessWidget {
           // Legend — 2-column grid
           Wrap(
             alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 14,
+            spacing: 20,
+            runSpacing: 12,
             children: segments.map((seg) {
-              return SizedBox(
-                width: (MediaQuery.of(context).size.width - 64) / 2,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: seg.color,
-                        shape: BoxShape.circle,
-                      ),
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: seg.color,
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        seg.label,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 13,
-                            ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    seg.label,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 13,
+                        ),
+                  ),
+                ],
               );
             }).toList(),
           ),
