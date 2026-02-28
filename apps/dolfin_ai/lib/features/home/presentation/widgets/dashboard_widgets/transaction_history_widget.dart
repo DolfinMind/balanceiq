@@ -177,24 +177,18 @@ class TransactionHistoryWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: isIncome
-                      ? Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.1)
-                      : Theme.of(context)
-                          .colorScheme
-                          .error
-                          .withValues(alpha: 0.1),
+                      ? const Color(0xFF5B8DEF).withValues(alpha: 0.1)
+                      : const Color(0xFFF97066).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: isIncome
                     ? GetIt.I<AppIcons>().dashboard.income(
                           size: 20,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: const Color(0xFF5B8DEF),
                         )
                     : GetIt.I<AppIcons>().dashboard.expense(
                           size: 20,
-                          color: Theme.of(context).colorScheme.error,
+                          color: const Color(0xFFF97066),
                         ),
               ),
               const SizedBox(width: 12),
@@ -235,7 +229,7 @@ class TransactionHistoryWidget extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: isIncome
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.error,
+                              : colorScheme.onSurface,
                         ),
                   ),
                   const SizedBox(width: 4),

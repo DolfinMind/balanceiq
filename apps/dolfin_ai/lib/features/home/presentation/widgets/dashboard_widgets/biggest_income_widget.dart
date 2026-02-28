@@ -2,7 +2,6 @@ import 'package:balance_iq/core/strings/dashboard_strings.dart';
 import 'package:balance_iq/core/icons/app_icons.dart';
 import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:balance_iq/core/di/injection_container.dart';
-import 'package:dolfin_ui_kit/theme/app_palette.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart';
 
@@ -41,13 +40,12 @@ class BiggestIncomeWidget extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color:
-                  GetIt.instance<AppPalette>().income.withValues(alpha: 0.15),
+              color: const Color(0xFF5B8DEF).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: GetIt.I<AppIcons>().dashboard.income(
                   size: 24,
-                  color: GetIt.instance<AppPalette>().income,
+                  color: const Color(0xFF5B8DEF),
                 ),
           ),
           const SizedBox(width: 16),
@@ -80,7 +78,7 @@ class BiggestIncomeWidget extends StatelessWidget {
             style: textTheme.titleMedium?.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: GetIt.instance<AppPalette>().income.withValues(alpha: 0.8),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ],

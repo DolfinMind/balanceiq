@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 import '../../domain/entities/dashbaord_summary.dart';
-import 'analysis_widgets/accounts_breakdown_widget.dart';
 import 'analysis_widgets/spending_donut_chart.dart';
 import 'analysis_widgets/category_breakdown_widget.dart';
 import 'dashboard_widgets/balance_card_widget.dart';
 import 'dashboard_widgets/biggest_expense_widget.dart';
 import 'dashboard_widgets/biggest_income_widget.dart';
-import 'dashboard_widgets/financial_ratio_widget.dart';
 import 'dashboard_widgets/floating_chat_button.dart';
 import 'dashboard_widgets/home_appbar.dart';
 import 'dashboard_widgets/transaction_history_widget.dart';
@@ -126,33 +124,6 @@ class DashboardLayout extends StatelessWidget {
               SliverToBoxAdapter(
                 child: const SizedBox(height: 16),
               ),
-
-              // Financial Ratios
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: FinancialRatiosWidget(
-                    expenseRatio: summary.expenseRatio,
-                    savingsRate: summary.savingsRate,
-                  ),
-                ),
-              ),
-
-              SliverToBoxAdapter(
-                child: const SizedBox(height: 16),
-              ),
-
-              // Accounts Breakdown
-              if (summary.accountsBreakdown.isNotEmpty) ...[
-                SliverToBoxAdapter(
-                  child: AccountsBreakdownWidget(
-                    accountsBreakdown: summary.accountsBreakdown,
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: const SizedBox(height: 16),
-                ),
-              ],
 
               // Biggest Income & Expense
               SliverToBoxAdapter(
