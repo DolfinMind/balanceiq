@@ -5,8 +5,7 @@ import '../../domain/entities/dashbaord_summary.dart';
 import 'analysis_widgets/spending_donut_chart.dart';
 import 'analysis_widgets/category_breakdown_widget.dart';
 import 'dashboard_widgets/balance_card_widget.dart';
-import 'dashboard_widgets/biggest_expense_widget.dart';
-import 'dashboard_widgets/biggest_income_widget.dart';
+import 'dashboard_widgets/highlights_insight_card.dart';
 import 'dashboard_widgets/floating_chat_button.dart';
 import 'dashboard_widgets/home_appbar.dart';
 import 'dashboard_widgets/transaction_history_widget.dart';
@@ -98,7 +97,19 @@ class DashboardLayout extends StatelessWidget {
                 ),
               ],
 
-              // Category Breakdown
+              // Transaction History
+              SliverToBoxAdapter(
+                child: TransactionHistoryWidget(
+                  onViewAll: onViewAll,
+                  onRefresh: onRefresh,
+                ),
+              ),
+
+              SliverToBoxAdapter(
+                child: const SizedBox(height: 16),
+              ),
+
+              // Category Breakdown (analysis-style vertical bars)
               if (summary.categories.isNotEmpty) ...[
                 SliverToBoxAdapter(
                   child: Padding(
@@ -113,19 +124,7 @@ class DashboardLayout extends StatelessWidget {
                 ),
               ],
 
-              // Transaction History
-              SliverToBoxAdapter(
-                child: TransactionHistoryWidget(
-                  onViewAll: onViewAll,
-                  onRefresh: onRefresh,
-                ),
-              ),
-
-              SliverToBoxAdapter(
-                child: const SizedBox(height: 16),
-              ),
-
-              // Biggest Income & Expense
+              // Highlights — Biggest Income & Expense combined
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -133,21 +132,12 @@ class DashboardLayout extends StatelessWidget {
                     right: 16,
                     bottom: 120,
                   ),
-                  child: Column(
-                    children: [
-                      BiggestIncomeWidget(
-                        amount: summary.biggestIncomeAmount,
-                        description: summary.biggestIncomeDescription,
-                      ),
-                      if (summary.biggestIncomeAmount > 0)
-                        const SizedBox(height: 16),
-                      BiggestExpenseWidget(
-                        amount: summary.biggestExpenseAmount,
-                        description: summary.biggestExpenseDescription,
-                        category: summary.expenseCategory,
-                        account: summary.expenseAccount,
-                      ),
-                    ],
+                  child: HighlightsInsightCard(
+                    biggestIncomeAmount: summary.biggestIncomeAmount,
+                    biggestIncomeDescription: summary.biggestIncomeDescription,
+                    biggestExpenseAmount: summary.biggestExpenseAmount,
+                    biggestExpenseDescription:
+                        summary.biggestExpenseDescription,
                   ),
                 ),
               ),

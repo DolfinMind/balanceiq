@@ -1,7 +1,6 @@
 import 'package:dolfin_core/constants/app_strings.dart';
 import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:balance_iq/core/di/injection_container.dart';
-import 'package:balance_iq/core/icons/app_icons.dart';
 import 'package:balance_iq/features/home/domain/entities/transaction.dart';
 import 'package:balance_iq/features/home/presentation/cubit/dashboard_cubit.dart';
 import 'package:balance_iq/features/home/presentation/cubit/transactions_cubit.dart';
@@ -91,11 +90,10 @@ class TransactionHistoryWidget extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: state.transactions.length > 5
-                    ? 5
+                itemCount: state.transactions.length > 3
+                    ? 3
                     : state.transactions.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12),
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemBuilder: (itemContext, index) {
                   return _buildTransactionItem(
                       parentContext, state.transactions[index]);
@@ -152,97 +150,123 @@ class TransactionHistoryWidget extends StatelessWidget {
   Widget _buildTransactionItem(BuildContext context, Transaction transaction) {
     final isIncome = transaction.isIncome;
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final catColor = _getCategoryColor(transaction.category);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _showTransactionDetail(context, transaction),
         borderRadius: BorderRadius.circular(12),
-        splashColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-        highlightColor: Theme.of(context).primaryColor.withValues(alpha: 0.05),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerLow,
+            color: catColor.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: colorScheme.outlineVariant.withValues(alpha: 0.2),
-              width: 1,
-            ),
           ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isIncome
-                      ? const Color(0xFF5B8DEF).withValues(alpha: 0.1)
-                      : const Color(0xFFF97066).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
+                  color: catColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: isIncome
-                    ? GetIt.I<AppIcons>().dashboard.income(
-                          size: 20,
-                          color: const Color(0xFF5B8DEF),
-                        )
-                    : GetIt.I<AppIcons>().dashboard.expense(
-                          size: 20,
-                          color: const Color(0xFFF97066),
-                        ),
+                child: Icon(
+                  _getCategoryIcon(transaction.category),
+                  size: 18,
+                  color: catColor,
+                ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       transaction.category,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
+                            fontSize: 13,
                           ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      DateFormat('MMM d, h:mm a')
+                      DateFormat('MMM d')
                           .format(transaction.createdAt.toLocal()),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 11,
                           ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    sl<CurrencyCubit>().formatAmountWithSign(transaction.amount,
-                        isIncome: isIncome),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isIncome
-                              ? Theme.of(context).colorScheme.primary
-                              : colorScheme.onSurface,
-                        ),
-                  ),
-                  const SizedBox(width: 4),
-                  GetIt.I<AppIcons>().navigation.chevronRight(
-                        size: 18,
-                        color: isDark ? Colors.white38 : Colors.grey[400],
-                      ),
-                ],
+              Text(
+                sl<CurrencyCubit>().formatAmountWithSign(transaction.amount,
+                    isIncome: isIncome),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      color: isIncome
+                          ? Theme.of(context).colorScheme.primary
+                          : colorScheme.onSurface,
+                    ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Color _getCategoryColor(String category) {
+    final name = category.toLowerCase();
+    if (name.contains('food') || name.contains('dining')) {
+      return const Color(0xFFFF9800);
+    }
+    if (name.contains('transport')) return const Color(0xFF42A5F5);
+    if (name.contains('shop')) return const Color(0xFFE91E63);
+    if (name.contains('bill') || name.contains('util')) {
+      return const Color(0xFF00BCD4);
+    }
+    if (name.contains('rent') || name.contains('house')) {
+      return const Color(0xFF5C6BC0);
+    }
+    if (name.contains('health') || name.contains('med')) {
+      return const Color(0xFFEC407A);
+    }
+    if (name.contains('entertain')) return const Color(0xFFAB47BC);
+    if (name.contains('salary') || name.contains('income')) {
+      return const Color(0xFF5B8DEF);
+    }
+    if (name.contains('grocery')) return const Color(0xFF66BB6A);
+    if (name.contains('travel')) return const Color(0xFF26C6DA);
+    return const Color(0xFF78909C);
+  }
+
+  IconData _getCategoryIcon(String category) {
+    final name = category.toLowerCase();
+    if (name.contains('food') || name.contains('dining')) {
+      return Icons.restaurant_rounded;
+    }
+    if (name.contains('transport')) return Icons.directions_car_rounded;
+    if (name.contains('shop')) return Icons.shopping_bag_rounded;
+    if (name.contains('bill') || name.contains('util')) {
+      return Icons.receipt_long_rounded;
+    }
+    if (name.contains('rent') || name.contains('house')) {
+      return Icons.home_rounded;
+    }
+    if (name.contains('health') || name.contains('med')) {
+      return Icons.medical_services_rounded;
+    }
+    if (name.contains('entertain')) return Icons.movie_rounded;
+    if (name.contains('salary') || name.contains('income')) {
+      return Icons.account_balance_rounded;
+    }
+    if (name.contains('grocery')) return Icons.local_grocery_store_rounded;
+    if (name.contains('travel')) return Icons.flight_rounded;
+    return Icons.category_rounded;
   }
 }
