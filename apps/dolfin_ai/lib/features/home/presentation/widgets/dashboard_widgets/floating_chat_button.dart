@@ -193,28 +193,30 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     required bool isDark,
     required VoidCallback onTap,
   }) {
-    final isSelected = _visualIndex == index;
-
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 44,
-        height: 44,
+      child: Container(
+        width: 48,
+        height: 48,
         decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primary.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+          color: colorScheme.primary,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.primary.withValues(alpha: 0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Center(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
               'assets/icons/app_icon.png',
-              width: 24,
-              height: 24,
+              width: 28,
+              height: 28,
               color: Colors.white,
               colorBlendMode: BlendMode.srcIn,
             ),

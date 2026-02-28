@@ -1,5 +1,6 @@
 import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../../core/di/injection_container.dart';
 import '../../domain/entities/dashbaord_summary.dart';
@@ -9,10 +10,14 @@ import '../widgets/analysis_widgets/spending_trend_chart.dart';
 /// No Scaffold, AppBar, or FloatingBottomNav – those live in the parent.
 class GraphsPage extends StatelessWidget {
   final DashboardSummary summary;
+  final String displayDate;
+  final VoidCallback? onTapDateRange;
 
   const GraphsPage({
     super.key,
     required this.summary,
+    this.displayDate = '',
+    this.onTapDateRange,
   });
 
   @override
@@ -30,16 +35,54 @@ class GraphsPage extends StatelessWidget {
           bottom: 100,
         ),
         children: [
-          // Page title
-          Center(
-            child: Text(
-              'Analysis',
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
+          // Page title + date range selector
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Analysis',
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
+              if (onTapDateRange != null)
+                GestureDetector(
+                  onTap: onTapDateRange,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color:
+                            colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(LucideIcons.calendar,
+                            size: 14, color: colorScheme.primary),
+                        const SizedBox(width: 6),
+                        Text(
+                          displayDate.isNotEmpty ? displayDate : 'Select Date',
+                          style: textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 20),
+
+          // ─── 0. Quick Stats Row ─────────────────────────
+          _buildQuickStats(context, colorScheme, textTheme, currencyCubit),
+          const SizedBox(height: 24),
 
           // ─── 1. Financial Health Overview ───────────────
           _sectionTitle(context, 'Financial Health'),
@@ -47,7 +90,13 @@ class GraphsPage extends StatelessWidget {
           _buildFinancialHealth(context, colorScheme, textTheme),
           const SizedBox(height: 28),
 
-          // ─── 2. Spending Trend ─────────────────────────
+          // ─── 2. Top Spending Insight ────────────────────
+          if (summary.categories.isNotEmpty) ...[
+            _buildTopSpendingInsight(context, colorScheme, textTheme),
+            const SizedBox(height: 28),
+          ],
+
+          // ─── 3. Spending Trend ─────────────────────────
           if (summary.spendingTrend.isNotEmpty) ...[
             _sectionTitle(context, 'Spending Trend'),
             const SizedBox(height: 12),
@@ -57,7 +106,7 @@ class GraphsPage extends StatelessWidget {
             const SizedBox(height: 28),
           ],
 
-          // ─── 3. Income vs Expense Bar ──────────────────
+          // ─── 4. Income vs Expense Bar ──────────────────
           if (summary.totalIncome > 0 || summary.totalExpense > 0) ...[
             _sectionTitle(context, 'Income vs Expense'),
             const SizedBox(height: 12),
@@ -66,7 +115,7 @@ class GraphsPage extends StatelessWidget {
             const SizedBox(height: 28),
           ],
 
-          // ─── 4. Category Breakdown ─────────────────────
+          // ─── 5. Category Breakdown ─────────────────────
           if (summary.categories.isNotEmpty) ...[
             _sectionTitle(context, 'Spending by Category'),
             const SizedBox(height: 12),
@@ -75,7 +124,7 @@ class GraphsPage extends StatelessWidget {
             const SizedBox(height: 28),
           ],
 
-          // ─── 5. Accounts Distribution ──────────────────
+          // ─── 6. Accounts Distribution ──────────────────
           if (summary.accountsBreakdown.isNotEmpty) ...[
             _sectionTitle(context, 'Accounts'),
             const SizedBox(height: 12),
@@ -93,10 +142,113 @@ class GraphsPage extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-            letterSpacing: -0.2,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
           ),
+    );
+  }
+
+  // ─── 0. Quick Stats Row ─────────────────────────────────────
+
+  Widget _buildQuickStats(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    CurrencyCubit currencyCubit,
+  ) {
+    // Calculate daily average spending
+    final days =
+        summary.spendingTrend.isNotEmpty ? summary.spendingTrend.length : 30;
+    final dailyAvg = days > 0 ? summary.totalExpense / days : 0.0;
+
+    // Net cash flow
+    final netFlow = summary.totalIncome - summary.totalExpense;
+    final isPositive = netFlow >= 0;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _statCard(
+            context,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+            icon: LucideIcons.trendingDown,
+            iconColor: const Color(0xFFEF5350),
+            label: 'Daily Avg Spend',
+            value: currencyCubit.formatAmount(dailyAvg),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _statCard(
+            context,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+            icon:
+                isPositive ? LucideIcons.trendingUp : LucideIcons.trendingDown,
+            iconColor:
+                isPositive ? const Color(0xFF4CAF50) : const Color(0xFFEF5350),
+            label: 'Net Cash Flow',
+            value: currencyCubit.formatAmount(netFlow.abs()),
+            prefix: isPositive ? '+' : '-',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _statCard(
+    BuildContext context, {
+    required ColorScheme colorScheme,
+    required TextTheme textTheme,
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required String value,
+    String prefix = '',
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 18, color: iconColor),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '$prefix$value',
+            style: textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: colorScheme.onSurface,
+              fontSize: 16,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -107,6 +259,11 @@ class GraphsPage extends StatelessWidget {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
+    // Budget utilization — how much of income is consumed by expenses
+    final budgetUtil = summary.totalIncome > 0
+        ? (summary.totalExpense / summary.totalIncome * 100).clamp(0.0, 200.0)
+        : 0.0;
+
     return Row(
       children: [
         // Expense Ratio
@@ -135,37 +292,16 @@ class GraphsPage extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        // Days Remaining
+        // Budget Utilization (replaces Days Left)
         Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: colorScheme.outlineVariant.withValues(alpha: 0.2),
-              ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  '${summary.daysRemainingInMonth}',
-                  style: textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Days Left',
-                  style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+          child: _buildGaugeCard(
+            context,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+            label: 'Budget Used',
+            value: (budgetUtil / 100).clamp(0.0, 1.0),
+            displayValue: '${budgetUtil.toStringAsFixed(0)}%',
+            color: _getBudgetColor(budgetUtil),
           ),
         ),
       ],
@@ -244,6 +380,92 @@ class GraphsPage extends StatelessWidget {
     if (rate >= 30) return const Color(0xFF4CAF50);
     if (rate >= 10) return const Color(0xFFFFA726);
     return const Color(0xFFEF5350);
+  }
+
+  Color _getBudgetColor(double utilization) {
+    if (utilization <= 60) return const Color(0xFF4CAF50);
+    if (utilization <= 85) return const Color(0xFFFFA726);
+    return const Color(0xFFEF5350);
+  }
+
+  // ─── 2. Top Spending Insight ────────────────────────────────
+
+  Widget _buildTopSpendingInsight(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    final sorted = summary.categories.entries.toList()
+      ..sort((a, b) => b.value.abs().compareTo(a.value.abs()));
+
+    if (sorted.isEmpty) return const SizedBox.shrink();
+
+    final top = sorted.first;
+    final total = sorted.fold<double>(0, (s, e) => s + e.value.abs());
+    final pct = total > 0 ? (top.value.abs() / total * 100) : 0.0;
+    final topColor = _getCategoryColor(top.key, 0);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: topColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: topColor.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: topColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(LucideIcons.lightbulb, color: topColor, size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Top Spending',
+                  style: textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                RichText(
+                  text: TextSpan(
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                      height: 1.3,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: top.key,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: topColor,
+                        ),
+                      ),
+                      TextSpan(
+                        text:
+                            ' takes ${pct.toStringAsFixed(0)}% of your spending',
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ─── 3. Income vs Expense ───────────────────────────────────

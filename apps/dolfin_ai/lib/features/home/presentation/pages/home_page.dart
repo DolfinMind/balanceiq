@@ -379,7 +379,11 @@ class _DashboardViewState extends State<DashboardView> {
                           : Stack(
                               key: const ValueKey('analysis'),
                               children: [
-                                GraphsPage(summary: summary),
+                                GraphsPage(
+                                  summary: summary,
+                                  displayDate: _getFormattedDateRange(),
+                                  onTapDateRange: _selectDateRange,
+                                ),
                                 Positioned(
                                   left: 0,
                                   right: 0,
