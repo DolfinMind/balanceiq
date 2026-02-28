@@ -7,8 +7,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'add_transaction_bottom_sheet.dart';
 
 /// Modern frosted glass floating bottom navigation bar.
-/// Three icon-only items: History (left), Chat (center), Add (right).
-class FloatingBottomNav extends StatelessWidget {
+/// Three icon-only items: Home (left, initially selected), Chat (center), Add (right).
+class FloatingBottomNav extends StatefulWidget {
   final VoidCallback? onDashboardRefresh;
   final VoidCallback? onViewAllTransactions;
 
@@ -18,7 +18,15 @@ class FloatingBottomNav extends StatelessWidget {
     this.onViewAllTransactions,
   });
 
-  void _navigateToChat(BuildContext context) async {
+  @override
+  State<FloatingBottomNav> createState() => _FloatingBottomNavState();
+}
+
+class _FloatingBottomNavState extends State<FloatingBottomNav> {
+  int _selectedIndex = 0; // Home selected initially
+
+  void _navigateToChat() async {
+    setState(() => _selectedIndex = 1);
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -28,36 +36,30 @@ class FloatingBottomNav extends StatelessWidget {
         ),
       ),
     );
-    onDashboardRefresh?.call();
+    setState(() => _selectedIndex = 0);
+    widget.onDashboardRefresh?.call();
   }
 
-  void _showAddTransactionSheet(BuildContext context) {
+  void _showAddTransactionSheet() {
+    setState(() => _selectedIndex = 2);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => AddTransactionBottomSheet(
         onSuccess: () {
-          onDashboardRefresh?.call();
+          widget.onDashboardRefresh?.call();
         },
       ),
-    );
-  }
-
-  void _navigateToTransactions(BuildContext context) async {
-    final hasChanges = await Navigator.pushNamed(context, '/transactions');
-    if (hasChanges == true) {
-      onDashboardRefresh?.call();
-    }
+    ).whenComplete(() {
+      if (mounted) setState(() => _selectedIndex = 0);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
-    final iconColor = isDark
-        ? Colors.white.withValues(alpha: 0.85)
-        : colorScheme.onSurface.withValues(alpha: 0.7);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
@@ -91,19 +93,25 @@ class FloatingBottomNav extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _navIcon(
-                  onTap: () => _navigateToTransactions(context),
-                  icon: LucideIcons.clock,
-                  color: iconColor,
+                  index: 0,
+                  icon: LucideIcons.house,
+                  colorScheme: colorScheme,
+                  isDark: isDark,
+                  onTap: () => setState(() => _selectedIndex = 0),
                 ),
                 _navIcon(
-                  onTap: () => _navigateToChat(context),
+                  index: 1,
                   icon: LucideIcons.messageCircle,
-                  color: iconColor,
+                  colorScheme: colorScheme,
+                  isDark: isDark,
+                  onTap: _navigateToChat,
                 ),
                 _navIcon(
-                  onTap: () => _showAddTransactionSheet(context),
+                  index: 2,
                   icon: LucideIcons.plus,
-                  color: iconColor,
+                  colorScheme: colorScheme,
+                  isDark: isDark,
+                  onTap: _showAddTransactionSheet,
                 ),
               ],
             ),
@@ -114,17 +122,36 @@ class FloatingBottomNav extends StatelessWidget {
   }
 
   Widget _navIcon({
-    required VoidCallback onTap,
+    required int index,
     required IconData icon,
-    required Color color,
+    required ColorScheme colorScheme,
+    required bool isDark,
+    required VoidCallback onTap,
   }) {
+    final isSelected = _selectedIndex == index;
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 56,
-        height: 56,
-        child: Icon(icon, size: 22, color: color),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: isSelected
+              ? colorScheme.primary.withValues(alpha: 0.15)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Icon(
+          icon,
+          size: 22,
+          color: isSelected
+              ? colorScheme.primary
+              : isDark
+                  ? Colors.white.withValues(alpha: 0.55)
+                  : colorScheme.onSurface.withValues(alpha: 0.45),
+        ),
       ),
     );
   }
