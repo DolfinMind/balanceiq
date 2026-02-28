@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/di/injection_container.dart';
 
 /// Spending donut chart with thick rounded arc segments.
-/// Custom painted to match the reference design exactly.
+/// Custom painted to match the reference design.
 class SpendingDonutChart extends StatelessWidget {
   final Map<String, double> categories;
   final double totalExpense;
@@ -35,7 +35,6 @@ class SpendingDonutChart extends StatelessWidget {
       (sum, e) => sum + e.value.abs(),
     );
 
-    // Build segment data with colors
     final segments = sortedEntries.asMap().entries.map((mapEntry) {
       final index = mapEntry.key;
       final entry = mapEntry.value;
@@ -52,20 +51,15 @@ class SpendingDonutChart extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // Donut with center text
           SizedBox(
-            height: 280,
-            width: 280,
+            height: 260,
+            width: 260,
             child: Stack(
               alignment: Alignment.center,
               children: [
                 CustomPaint(
-                  size: const Size(280, 280),
-                  painter: _DonutPainter(
-                    segments: segments,
-                    thickness: 42,
-                    gapDegrees: 8,
-                  ),
+                  size: const Size(260, 260),
+                  painter: _DonutPainter(segments: segments),
                 ),
                 // Center label
                 Column(
@@ -84,7 +78,7 @@ class SpendingDonutChart extends StatelessWidget {
                       currencyCubit.formatAmount(totalExpense),
                       style: textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w900,
-                        fontSize: 24,
+                        fontSize: 22,
                         letterSpacing: -0.5,
                         color: colorScheme.onSurface,
                       ),
@@ -94,9 +88,7 @@ class SpendingDonutChart extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 24),
-
           // Legend — 2-column grid
           Wrap(
             spacing: 8,
@@ -159,7 +151,6 @@ class SpendingDonutChart extends StatelessWidget {
     if (name.contains('health') || name.contains('med')) {
       return const Color(0xFFEC407A);
     }
-
     final colors = [
       const Color(0xFFFFCA28),
       const Color(0xFF66BB6A),
@@ -171,8 +162,6 @@ class SpendingDonutChart extends StatelessWidget {
     return colors[index % colors.length];
   }
 }
-
-// ─── Data model ──────────────────────────────────────────────
 
 class _DonutSegment {
   final String label;
@@ -188,131 +177,102 @@ class _DonutSegment {
   });
 }
 
-// ─── CustomPainter ───────────────────────────────────────────
-
+/// Simple, clean donut painter.
+/// Draws each segment as a stroked arc (butt cap) + two filled circles
+/// at the endpoints to create rounded ends without overlap.
 class _DonutPainter extends CustomPainter {
   final List<_DonutSegment> segments;
-  final double thickness;
-  final double gapDegrees;
 
-  _DonutPainter({
-    required this.segments,
-    this.thickness = 42,
-    this.gapDegrees = 8,
-  });
+  static const double _strokeWidth = 36;
+  static const double _gapDeg = 6;
+
+  _DonutPainter({required this.segments});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final outerRadius = min(size.width, size.height) / 2 - 4;
-    final innerRadius = outerRadius - thickness;
+    final radius = (min(size.width, size.height) - _strokeWidth) / 2;
+    final arcRect = Rect.fromCircle(center: center, radius: radius);
 
-    final totalGap = gapDegrees * segments.length;
-    final availableDegrees = 360.0 - totalGap;
+    final totalGapDeg = _gapDeg * segments.length;
+    final usableDeg = 360.0 - totalGapDeg;
 
-    final totalValue = segments.fold<double>(0, (s, seg) => s + seg.value);
-    if (totalValue == 0) return;
+    final totalVal = segments.fold<double>(0, (s, seg) => s + seg.value);
+    if (totalVal == 0) return;
 
-    // Half gap in radians for the rounded-end inset
-
-    final capRadius = thickness / 2; // radius for rounded ends
-
-    double currentAngle = -90.0; // Start from top
+    final capR = _strokeWidth / 2;
+    double angle = -90.0; // 12 o'clock
 
     for (final seg in segments) {
-      final sweepDeg = (seg.value / totalValue) * availableDegrees;
-      final startRad = _toRadians(currentAngle);
-      final sweepRad = _toRadians(sweepDeg);
+      final sweepDeg = (seg.value / totalVal) * usableDeg;
+      final startRad = angle * pi / 180;
+      final endRad = (angle + sweepDeg) * pi / 180;
 
-      // Build filled path: outer arc → end cap → inner arc (reversed) → start cap
-      final path = Path();
-
-      // Outer arc
-      final outerRect = Rect.fromCircle(center: center, radius: outerRadius);
-      path.addArc(outerRect, startRad, sweepRad);
-
-      // End rounded cap: small semicircle connecting outer→inner at end angle
-      final endAngle = startRad + sweepRad;
-      final endCapCenter = Offset(
-        center.dx + (outerRadius - capRadius) * cos(endAngle),
-        center.dy + (outerRadius - capRadius) * sin(endAngle),
-      );
-      path.addArc(
-        Rect.fromCircle(center: endCapCenter, radius: capRadius),
-        endAngle,
-        pi,
-      );
-
-      // Inner arc (reversed)
-      final innerRect = Rect.fromCircle(center: center, radius: innerRadius);
-      path.addArc(innerRect, endAngle, -sweepRad);
-
-      // Start rounded cap: semicircle connecting inner→outer at start angle
-      final startCapCenter = Offset(
-        center.dx + (outerRadius - capRadius) * cos(startRad),
-        center.dy + (outerRadius - capRadius) * sin(startRad),
-      );
-      path.addArc(
-        Rect.fromCircle(center: startCapCenter, radius: capRadius),
-        startRad + pi,
-        pi,
-      );
-
-      path.close();
-
-      final paint = Paint()
+      // 1) Draw the arc with butt caps (no overlap)
+      final arcPaint = Paint()
         ..color = seg.color
-        ..style = PaintingStyle.fill
-        ..isAntiAlias = true;
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = _strokeWidth
+        ..strokeCap = StrokeCap.butt;
 
-      canvas.drawPath(path, paint);
+      canvas.drawArc(arcRect, startRad, sweepDeg * pi / 180, false, arcPaint);
 
-      // Draw percentage label at midpoint of arc
+      // 2) Draw filled circles at both endpoints for rounded ends
+      final capPaint = Paint()
+        ..color = seg.color
+        ..style = PaintingStyle.fill;
+
+      // Start cap
+      canvas.drawCircle(
+        Offset(
+          center.dx + radius * cos(startRad),
+          center.dy + radius * sin(startRad),
+        ),
+        capR,
+        capPaint,
+      );
+
+      // End cap
+      canvas.drawCircle(
+        Offset(
+          center.dx + radius * cos(endRad),
+          center.dy + radius * sin(endRad),
+        ),
+        capR,
+        capPaint,
+      );
+
+      // 3) Percentage label at midpoint
       if (seg.percentage >= 5) {
-        final midAngle = currentAngle + sweepDeg / 2;
-        final midRad = _toRadians(midAngle);
-        // Position label at the middle of the arc thickness
-        final labelRadius = innerRadius + thickness / 2;
-        final labelX = center.dx + labelRadius * cos(midRad);
-        final labelY = center.dy + labelRadius * sin(midRad);
+        final midRad = (angle + sweepDeg / 2) * pi / 180;
+        final lx = center.dx + radius * cos(midRad);
+        final ly = center.dy + radius * sin(midRad);
 
-        final textSpan = TextSpan(
-          text: '${seg.percentage.toStringAsFixed(0)}%',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            shadows: [
-              Shadow(
-                blurRadius: 4,
-                color: Colors.black.withValues(alpha: 0.4),
-              ),
-            ],
+        final tp = TextPainter(
+          text: TextSpan(
+            text: '${seg.percentage.toStringAsFixed(0)}%',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              shadows: [
+                Shadow(
+                  blurRadius: 4,
+                  color: Colors.black.withValues(alpha: 0.5),
+                ),
+              ],
+            ),
           ),
-        );
-
-        final textPainter = TextPainter(
-          text: textSpan,
           textDirection: TextDirection.ltr,
         )..layout();
 
-        textPainter.paint(
-          canvas,
-          Offset(
-            labelX - textPainter.width / 2,
-            labelY - textPainter.height / 2,
-          ),
-        );
+        tp.paint(canvas, Offset(lx - tp.width / 2, ly - tp.height / 2));
       }
 
-      currentAngle += sweepDeg + gapDegrees;
+      angle += sweepDeg + _gapDeg;
     }
   }
 
-  double _toRadians(double degrees) => degrees * pi / 180;
-
   @override
-  bool shouldRepaint(covariant _DonutPainter oldDelegate) {
-    return oldDelegate.segments != segments;
-  }
+  bool shouldRepaint(covariant _DonutPainter old) => true;
 }
