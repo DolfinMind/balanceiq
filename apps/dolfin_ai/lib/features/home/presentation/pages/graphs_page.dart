@@ -4,19 +4,15 @@ import 'package:flutter/material.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../domain/entities/dashbaord_summary.dart';
 import '../widgets/analysis_widgets/spending_trend_chart.dart';
-import '../widgets/dashboard_widgets/floating_chat_button.dart';
 
-/// Analysis screen with useful financial insights.
-/// 5 sections: Financial Health, Spending Trend, Income vs Expense,
-/// Category Breakdown, Accounts Distribution.
+/// Analysis tab content – embeddable inside a parent Stack.
+/// No Scaffold, AppBar, or FloatingBottomNav – those live in the parent.
 class GraphsPage extends StatelessWidget {
   final DashboardSummary summary;
-  final VoidCallback? onDashboardRefresh;
 
   const GraphsPage({
     super.key,
     required this.summary,
-    this.onDashboardRefresh,
   });
 
   @override
@@ -25,86 +21,67 @@ class GraphsPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final currencyCubit = sl<CurrencyCubit>();
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Analysis',
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: 100,
         ),
-        centerTitle: true,
-        backgroundColor: colorScheme.surface,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Stack(
         children: [
-          ListView(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 8,
-              bottom: 100,
-            ),
-            children: [
-              // ─── 1. Financial Health Overview ───────────────
-              _sectionTitle(context, 'Financial Health'),
-              const SizedBox(height: 12),
-              _buildFinancialHealth(context, colorScheme, textTheme),
-              const SizedBox(height: 28),
-
-              // ─── 2. Spending Trend ─────────────────────────
-              if (summary.spendingTrend.isNotEmpty) ...[
-                _sectionTitle(context, 'Spending Trend'),
-                const SizedBox(height: 12),
-                SpendingTrendChart(
-                  spendingTrend: summary.spendingTrend,
-                ),
-                const SizedBox(height: 28),
-              ],
-
-              // ─── 3. Income vs Expense Bar ──────────────────
-              if (summary.totalIncome > 0 || summary.totalExpense > 0) ...[
-                _sectionTitle(context, 'Income vs Expense'),
-                const SizedBox(height: 12),
-                _buildIncomeVsExpense(
-                    context, colorScheme, textTheme, currencyCubit),
-                const SizedBox(height: 28),
-              ],
-
-              // ─── 4. Category Breakdown ─────────────────────
-              if (summary.categories.isNotEmpty) ...[
-                _sectionTitle(context, 'Spending by Category'),
-                const SizedBox(height: 12),
-                _buildCategoryBreakdown(
-                    context, colorScheme, textTheme, currencyCubit),
-                const SizedBox(height: 28),
-              ],
-
-              // ─── 5. Accounts Distribution ──────────────────
-              if (summary.accountsBreakdown.isNotEmpty) ...[
-                _sectionTitle(context, 'Accounts'),
-                const SizedBox(height: 12),
-                _buildAccountsDistribution(
-                    context, colorScheme, textTheme, currencyCubit),
-              ],
-            ],
-          ),
-
-          // Floating bottom nav
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: FloatingBottomNav(
-              onDashboardRefresh: onDashboardRefresh,
-              initialIndex: 2,
-              onNavigateHome: () => Navigator.pop(context),
+          // Page title
+          Center(
+            child: Text(
+              'Analysis',
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
+          const SizedBox(height: 20),
+
+          // ─── 1. Financial Health Overview ───────────────
+          _sectionTitle(context, 'Financial Health'),
+          const SizedBox(height: 12),
+          _buildFinancialHealth(context, colorScheme, textTheme),
+          const SizedBox(height: 28),
+
+          // ─── 2. Spending Trend ─────────────────────────
+          if (summary.spendingTrend.isNotEmpty) ...[
+            _sectionTitle(context, 'Spending Trend'),
+            const SizedBox(height: 12),
+            SpendingTrendChart(
+              spendingTrend: summary.spendingTrend,
+            ),
+            const SizedBox(height: 28),
+          ],
+
+          // ─── 3. Income vs Expense Bar ──────────────────
+          if (summary.totalIncome > 0 || summary.totalExpense > 0) ...[
+            _sectionTitle(context, 'Income vs Expense'),
+            const SizedBox(height: 12),
+            _buildIncomeVsExpense(
+                context, colorScheme, textTheme, currencyCubit),
+            const SizedBox(height: 28),
+          ],
+
+          // ─── 4. Category Breakdown ─────────────────────
+          if (summary.categories.isNotEmpty) ...[
+            _sectionTitle(context, 'Spending by Category'),
+            const SizedBox(height: 12),
+            _buildCategoryBreakdown(
+                context, colorScheme, textTheme, currencyCubit),
+            const SizedBox(height: 28),
+          ],
+
+          // ─── 5. Accounts Distribution ──────────────────
+          if (summary.accountsBreakdown.isNotEmpty) ...[
+            _sectionTitle(context, 'Accounts'),
+            const SizedBox(height: 12),
+            _buildAccountsDistribution(
+                context, colorScheme, textTheme, currencyCubit),
+          ],
         ],
       ),
     );

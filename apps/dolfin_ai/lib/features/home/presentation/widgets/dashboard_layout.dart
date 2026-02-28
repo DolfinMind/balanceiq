@@ -20,7 +20,8 @@ class DashboardLayout extends StatelessWidget {
   final VoidCallback onTapDateRange;
   final VoidCallback onViewAll;
   final VoidCallback? onChatReturn;
-  final VoidCallback? onNavigateToGraphs;
+  final ValueChanged<int>? onTabChanged;
+  final int selectedTab;
   final String profileUrl;
   final String userName;
   final String displayDate;
@@ -34,7 +35,8 @@ class DashboardLayout extends StatelessWidget {
     required this.onTapDateRange,
     required this.onViewAll,
     this.onChatReturn,
-    this.onNavigateToGraphs,
+    this.onTabChanged,
+    this.selectedTab = 0,
     required this.profileUrl,
     required this.userName,
     required this.displayDate,
@@ -84,7 +86,6 @@ class DashboardLayout extends StatelessWidget {
                 child: const SizedBox(height: 16),
               ),
 
-              // Analysis Carousel
               // Spending Donut Chart
               if (summary.categories.isNotEmpty &&
                   summary.totalExpense > 0) ...[
@@ -99,7 +100,7 @@ class DashboardLayout extends StatelessWidget {
                 ),
               ],
 
-              // Category Breakdown (elevated for spending focus)
+              // Category Breakdown
               if (summary.categories.isNotEmpty) ...[
                 SliverToBoxAdapter(
                   child: Padding(
@@ -114,7 +115,7 @@ class DashboardLayout extends StatelessWidget {
                 ),
               ],
 
-              // Transaction History (elevated for spending focus)
+              // Transaction History
               SliverToBoxAdapter(
                 child: TransactionHistoryWidget(
                   onViewAll: onViewAll,
@@ -182,7 +183,7 @@ class DashboardLayout extends StatelessWidget {
             ],
           ),
         ),
-        // Positioned chat button at the bottom
+        // Positioned bottom nav
         Positioned(
           left: 0,
           right: 0,
@@ -191,7 +192,8 @@ class DashboardLayout extends StatelessWidget {
             tag: 'bottom_nav',
             child: FloatingBottomNav(
               onDashboardRefresh: onChatReturn,
-              onNavigateToGraphs: onNavigateToGraphs,
+              onTabChanged: onTabChanged,
+              selectedTab: selectedTab,
             ),
           ),
         ),

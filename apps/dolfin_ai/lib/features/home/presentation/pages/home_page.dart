@@ -15,6 +15,7 @@ import '../cubit/dashboard_cubit.dart';
 import '../cubit/transactions_cubit.dart';
 import '../widgets/calendar_widgets/date_selector_bottom_sheet.dart';
 import '../widgets/dashboard_layout.dart';
+import '../widgets/dashboard_widgets/floating_chat_button.dart';
 import 'error_page.dart';
 import 'graphs_page.dart';
 import 'welcome_page.dart';
@@ -46,6 +47,7 @@ class _DashboardViewState extends State<DashboardView> {
   DateTime? _endDate;
   bool _tourCheckDone = false;
   String? _selectedDateLabel = 'Last 30 Days'; // Initialize with default label
+  int _currentTab = 0; // 0 = Home, 1 = Analysis
 
   final GlobalKey _profileIconKey = GlobalKey();
   late DashboardTourController _tourController;
@@ -344,34 +346,54 @@ class _DashboardViewState extends State<DashboardView> {
                   if (state is DashboardLoaded) {
                     final summary = state.summary;
 
-                    return DashboardLayout(
-                      summary: summary,
-                      onRefresh: _refreshDashboard,
-                      onTapProfileIcon: () {
-                        final tourCubit = context.read<ProductTourCubit>();
-                        if (tourCubit.isAtStep(TourStep.dashboardProfileIcon)) {
-                          tourCubit.onProfileIconTapped();
-                        }
-                        Navigator.pushNamed(context, '/profile');
-                      },
-                      onViewAll: _onViewAllTransactions,
-                      onChatReturn: _loadDashboard,
-                      onNavigateToGraphs: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => GraphsPage(
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeInOut,
+                      switchOutCurve: Curves.easeInOut,
+                      child: _currentTab == 0
+                          ? DashboardLayout(
+                              key: const ValueKey('home'),
                               summary: summary,
-                              onDashboardRefresh: _loadDashboard,
+                              onRefresh: _refreshDashboard,
+                              onTapProfileIcon: () {
+                                final tourCubit =
+                                    context.read<ProductTourCubit>();
+                                if (tourCubit
+                                    .isAtStep(TourStep.dashboardProfileIcon)) {
+                                  tourCubit.onProfileIconTapped();
+                                }
+                                Navigator.pushNamed(context, '/profile');
+                              },
+                              onViewAll: _onViewAllTransactions,
+                              onChatReturn: _loadDashboard,
+                              onTabChanged: (index) {
+                                setState(() => _currentTab = index);
+                              },
+                              selectedTab: _currentTab,
+                              profileUrl: _profileUrl ?? '',
+                              userName: _userName,
+                              displayDate: _getFormattedDateRange(),
+                              onTapDateRange: _selectDateRange,
+                              profileIconKey: _profileIconKey,
+                            )
+                          : Stack(
+                              key: const ValueKey('analysis'),
+                              children: [
+                                GraphsPage(summary: summary),
+                                Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  child: FloatingBottomNav(
+                                    onDashboardRefresh: _loadDashboard,
+                                    onTabChanged: (index) {
+                                      setState(() => _currentTab = index);
+                                    },
+                                    selectedTab: _currentTab,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        );
-                      },
-                      profileUrl: _profileUrl ?? '',
-                      userName: _userName,
-                      displayDate: _getFormattedDateRange(),
-                      onTapDateRange: _selectDateRange,
-                      profileIconKey: _profileIconKey,
                     );
                   }
 

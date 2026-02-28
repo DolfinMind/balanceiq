@@ -7,19 +7,19 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'add_transaction_bottom_sheet.dart';
 
 /// Modern frosted glass floating bottom navigation bar.
-/// Four icon-only items: Home (0), Chat (1), Graphs (2), Add (3).
+/// Four icon-only items: Home (0), Analysis (1), Chat (2), Add (3).
+/// Home and Analysis work as tabs via [onTabChanged].
+/// Chat and Add open modals and return to the previous tab.
 class FloatingBottomNav extends StatefulWidget {
   final VoidCallback? onDashboardRefresh;
-  final VoidCallback? onNavigateToGraphs;
-  final VoidCallback? onNavigateHome;
-  final int initialIndex;
+  final ValueChanged<int>? onTabChanged;
+  final int selectedTab;
 
   const FloatingBottomNav({
     super.key,
     this.onDashboardRefresh,
-    this.onNavigateToGraphs,
-    this.onNavigateHome,
-    this.initialIndex = 0,
+    this.onTabChanged,
+    this.selectedTab = 0,
   });
 
   @override
@@ -27,16 +27,31 @@ class FloatingBottomNav extends StatefulWidget {
 }
 
 class _FloatingBottomNavState extends State<FloatingBottomNav> {
-  late int _selectedIndex;
+  /// Tracks visual selection (may differ from tab during modal actions)
+  late int _visualIndex;
 
   @override
   void initState() {
     super.initState();
-    _selectedIndex = widget.initialIndex;
+    _visualIndex = widget.selectedTab;
+  }
+
+  @override
+  void didUpdateWidget(covariant FloatingBottomNav oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedTab != oldWidget.selectedTab) {
+      _visualIndex = widget.selectedTab;
+    }
+  }
+
+  void _onTapTab(int index) {
+    if (_visualIndex == index) return;
+    setState(() => _visualIndex = index);
+    widget.onTabChanged?.call(index);
   }
 
   void _navigateToChat() async {
-    setState(() => _selectedIndex = 1);
+    setState(() => _visualIndex = 2);
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -46,12 +61,12 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         ),
       ),
     );
-    if (mounted) setState(() => _selectedIndex = widget.initialIndex);
+    if (mounted) setState(() => _visualIndex = widget.selectedTab);
     widget.onDashboardRefresh?.call();
   }
 
   void _showAddTransactionSheet() {
-    setState(() => _selectedIndex = 3);
+    setState(() => _visualIndex = 3);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -62,20 +77,8 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         },
       ),
     ).whenComplete(() {
-      if (mounted) setState(() => _selectedIndex = widget.initialIndex);
+      if (mounted) setState(() => _visualIndex = widget.selectedTab);
     });
-  }
-
-  void _onTapHome() {
-    if (_selectedIndex == 0) return;
-    setState(() => _selectedIndex = 0);
-    widget.onNavigateHome?.call();
-  }
-
-  void _onTapGraphs() {
-    if (_selectedIndex == 2) return;
-    setState(() => _selectedIndex = 2);
-    widget.onNavigateToGraphs?.call();
   }
 
   @override
@@ -119,21 +122,21 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                   icon: LucideIcons.house,
                   colorScheme: colorScheme,
                   isDark: isDark,
-                  onTap: _onTapHome,
+                  onTap: () => _onTapTab(0),
                 ),
                 _navIcon(
                   index: 1,
+                  icon: LucideIcons.chartLine,
+                  colorScheme: colorScheme,
+                  isDark: isDark,
+                  onTap: () => _onTapTab(1),
+                ),
+                _navIcon(
+                  index: 2,
                   icon: LucideIcons.messageCircle,
                   colorScheme: colorScheme,
                   isDark: isDark,
                   onTap: _navigateToChat,
-                ),
-                _navIcon(
-                  index: 2,
-                  icon: LucideIcons.chartLine,
-                  colorScheme: colorScheme,
-                  isDark: isDark,
-                  onTap: _onTapGraphs,
                 ),
                 _navIcon(
                   index: 3,
@@ -157,7 +160,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     required bool isDark,
     required VoidCallback onTap,
   }) {
-    final isSelected = _selectedIndex == index;
+    final isSelected = _visualIndex == index;
 
     return GestureDetector(
       onTap: onTap,

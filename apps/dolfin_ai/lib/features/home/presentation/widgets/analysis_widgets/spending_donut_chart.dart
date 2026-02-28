@@ -92,6 +92,7 @@ class SpendingDonutChart extends StatelessWidget {
           const SizedBox(height: 24),
           // Legend — 2-column grid
           Wrap(
+            alignment: WrapAlignment.center,
             spacing: 8,
             runSpacing: 14,
             children: segments.map((seg) {
