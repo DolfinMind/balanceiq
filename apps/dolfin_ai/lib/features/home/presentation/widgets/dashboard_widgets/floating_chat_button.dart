@@ -131,8 +131,9 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                   isDark: isDark,
                   onTap: () => _onTapTab(1),
                 ),
-                _appIconButton(
+                _navIcon(
                   index: 2,
+                  icon: LucideIcons.messageCircle,
                   colorScheme: colorScheme,
                   isDark: isDark,
                   onTap: _navigateToChat,
@@ -182,45 +183,6 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
               : isDark
                   ? Colors.white.withValues(alpha: 0.55)
                   : colorScheme.onSurface.withValues(alpha: 0.45),
-        ),
-      ),
-    );
-  }
-
-  Widget _appIconButton({
-    required int index,
-    required ColorScheme colorScheme,
-    required bool isDark,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: colorScheme.primary,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.primary.withValues(alpha: 0.35),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              'assets/icons/app_icon.png',
-              width: 28,
-              height: 28,
-              color: Colors.white,
-              colorBlendMode: BlendMode.srcIn,
-            ),
-          ),
         ),
       ),
     );
