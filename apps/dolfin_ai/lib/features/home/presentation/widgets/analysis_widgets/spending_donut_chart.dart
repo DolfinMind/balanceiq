@@ -63,8 +63,8 @@ class SpendingDonutChart extends StatelessWidget {
                   size: const Size(280, 280),
                   painter: _DonutPainter(
                     segments: segments,
-                    strokeWidth: 38,
-                    gapDegrees: 5,
+                    thickness: 42,
+                    gapDegrees: 8,
                   ),
                 ),
                 // Center label
@@ -192,60 +192,100 @@ class _DonutSegment {
 
 class _DonutPainter extends CustomPainter {
   final List<_DonutSegment> segments;
-  final double strokeWidth;
+  final double thickness;
   final double gapDegrees;
 
   _DonutPainter({
     required this.segments,
-    this.strokeWidth = 38,
-    this.gapDegrees = 5,
+    this.thickness = 42,
+    this.gapDegrees = 8,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (min(size.width, size.height) - strokeWidth) / 2;
-    final rect = Rect.fromCircle(center: center, radius: radius);
+    final outerRadius = min(size.width, size.height) / 2 - 4;
+    final innerRadius = outerRadius - thickness;
 
     final totalGap = gapDegrees * segments.length;
     final availableDegrees = 360.0 - totalGap;
 
-    // Calculate total value
     final totalValue = segments.fold<double>(0, (s, seg) => s + seg.value);
     if (totalValue == 0) return;
 
-    double startAngle = -90; // Start from top
+    // Half gap in radians for the rounded-end inset
+
+    final capRadius = thickness / 2; // radius for rounded ends
+
+    double currentAngle = -90.0; // Start from top
 
     for (final seg in segments) {
-      final sweepAngle = (seg.value / totalValue) * availableDegrees;
+      final sweepDeg = (seg.value / totalValue) * availableDegrees;
+      final startRad = _toRadians(currentAngle);
+      final sweepRad = _toRadians(sweepDeg);
 
-      // Draw arc
+      // Build filled path: outer arc → end cap → inner arc (reversed) → start cap
+      final path = Path();
+
+      // Outer arc
+      final outerRect = Rect.fromCircle(center: center, radius: outerRadius);
+      path.addArc(outerRect, startRad, sweepRad);
+
+      // End rounded cap: small semicircle connecting outer→inner at end angle
+      final endAngle = startRad + sweepRad;
+      final endCapCenter = Offset(
+        center.dx + (outerRadius - capRadius) * cos(endAngle),
+        center.dy + (outerRadius - capRadius) * sin(endAngle),
+      );
+      path.addArc(
+        Rect.fromCircle(center: endCapCenter, radius: capRadius),
+        endAngle,
+        pi,
+      );
+
+      // Inner arc (reversed)
+      final innerRect = Rect.fromCircle(center: center, radius: innerRadius);
+      path.addArc(innerRect, endAngle, -sweepRad);
+
+      // Start rounded cap: semicircle connecting inner→outer at start angle
+      final startCapCenter = Offset(
+        center.dx + (outerRadius - capRadius) * cos(startRad),
+        center.dy + (outerRadius - capRadius) * sin(startRad),
+      );
+      path.addArc(
+        Rect.fromCircle(center: startCapCenter, radius: capRadius),
+        startRad + pi,
+        pi,
+      );
+
+      path.close();
+
       final paint = Paint()
         ..color = seg.color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round;
+        ..style = PaintingStyle.fill
+        ..isAntiAlias = true;
 
-      canvas.drawArc(
-          rect, _toRadians(startAngle), _toRadians(sweepAngle), false, paint);
+      canvas.drawPath(path, paint);
 
       // Draw percentage label at midpoint of arc
       if (seg.percentage >= 5) {
-        final midAngle = startAngle + sweepAngle / 2;
-        final labelRadius = radius; // On the arc
-        final labelX = center.dx + labelRadius * cos(_toRadians(midAngle));
-        final labelY = center.dy + labelRadius * sin(_toRadians(midAngle));
+        final midAngle = currentAngle + sweepDeg / 2;
+        final midRad = _toRadians(midAngle);
+        // Position label at the middle of the arc thickness
+        final labelRadius = innerRadius + thickness / 2;
+        final labelX = center.dx + labelRadius * cos(midRad);
+        final labelY = center.dy + labelRadius * sin(midRad);
 
         final textSpan = TextSpan(
           text: '${seg.percentage.toStringAsFixed(0)}%',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
             shadows: [
               Shadow(
-                blurRadius: 6,
-                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 4,
+                color: Colors.black.withValues(alpha: 0.4),
               ),
             ],
           ),
@@ -265,7 +305,7 @@ class _DonutPainter extends CustomPainter {
         );
       }
 
-      startAngle += sweepAngle + gapDegrees;
+      currentAngle += sweepDeg + gapDegrees;
     }
   }
 
