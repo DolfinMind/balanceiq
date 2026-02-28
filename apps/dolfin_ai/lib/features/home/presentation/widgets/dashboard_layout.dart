@@ -3,7 +3,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 import '../../domain/entities/dashbaord_summary.dart';
 import 'analysis_widgets/accounts_breakdown_widget.dart';
-import 'analysis_widgets/analysis_carousel.dart';
+import 'analysis_widgets/spending_donut_chart.dart';
 import 'analysis_widgets/category_breakdown_widget.dart';
 import 'dashboard_widgets/balance_card_widget.dart';
 import 'dashboard_widgets/biggest_expense_widget.dart';
@@ -83,12 +83,13 @@ class DashboardLayout extends StatelessWidget {
               ),
 
               // Analysis Carousel
-              if (summary.spendingTrend.isNotEmpty ||
-                  summary.categories.isNotEmpty ||
-                  (summary.totalIncome > 0 || summary.totalExpense > 0)) ...[
+              // Spending Donut Chart
+              if (summary.categories.isNotEmpty &&
+                  summary.totalExpense > 0) ...[
                 SliverToBoxAdapter(
-                  child: AnalysisCarousel(
-                    summary: summary,
+                  child: SpendingDonutChart(
+                    categories: summary.categories,
+                    totalExpense: summary.totalExpense,
                   ),
                 ),
                 SliverToBoxAdapter(
