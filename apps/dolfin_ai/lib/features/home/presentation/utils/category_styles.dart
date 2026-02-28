@@ -37,10 +37,10 @@ class CategoryStyles {
       return const Color(0xFFE91E63); // Pink
     }
     if (name.contains('rent') || name.contains('house')) {
-      return const Color(0xFF795548); // Brown
+      return const Color(0xFF009688); // Brown
     }
     if (name.contains('health') || name.contains('med')) {
-      return const Color(0xFF009688); // Teal
+      return const Color(0xFF795548); // Teal
     }
     if (name.contains('salary') || name.contains('income')) {
       return const Color(0xFF3F51B5); // Indigo
