@@ -4,6 +4,7 @@ import 'package:balance_iq/features/home/presentation/pages/transactions_page.da
 import 'package:balance_iq/core/strings/dashboard_strings.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart';
+import '../../../presentation/utils/category_styles.dart';
 
 class CategoryBreakdownWidget extends StatelessWidget {
   final Map<String, double> categories;
@@ -53,7 +54,7 @@ class CategoryBreakdownWidget extends StatelessWidget {
               final index = mapEntry.key;
               final entry = mapEntry.value;
               final pct = total > 0 ? (entry.value.abs() / total * 100) : 0.0;
-              final color = _getCategoryColor(entry.key, index);
+              final color = CategoryStyles.colorFor(entry.key);
 
               return GestureDetector(
                 onTap: () {
@@ -130,34 +131,5 @@ class CategoryBreakdownWidget extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  Color _getCategoryColor(String category, int index) {
-    final name = category.toLowerCase();
-    if (name.contains('food') || name.contains('dining')) {
-      return const Color(0xFFFF9800);
-    }
-    if (name.contains('transport')) return const Color(0xFF42A5F5);
-    if (name.contains('shop')) return const Color(0xFFE91E63);
-    if (name.contains('bill') || name.contains('util')) {
-      return const Color(0xFF00BCD4);
-    }
-    if (name.contains('rent') || name.contains('house')) {
-      return const Color(0xFF5C6BC0);
-    }
-    if (name.contains('health') || name.contains('med')) {
-      return const Color(0xFFEC407A);
-    }
-    if (name.contains('entertain')) return const Color(0xFFAB47BC);
-    if (name.contains('grocery')) return const Color(0xFF66BB6A);
-    if (name.contains('travel')) return const Color(0xFF26C6DA);
-
-    final colors = [
-      const Color(0xFF78909C),
-      const Color(0xFFFFCA28),
-      const Color(0xFFFF7043),
-      const Color(0xFF29B6F6),
-    ];
-    return colors[index % colors.length];
   }
 }

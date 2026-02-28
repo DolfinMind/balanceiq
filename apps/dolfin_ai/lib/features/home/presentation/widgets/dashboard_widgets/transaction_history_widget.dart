@@ -12,6 +12,7 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../utils/category_styles.dart';
 
 class TransactionHistoryWidget extends StatelessWidget {
   final VoidCallback onViewAll;
@@ -150,7 +151,7 @@ class TransactionHistoryWidget extends StatelessWidget {
   Widget _buildTransactionItem(BuildContext context, Transaction transaction) {
     final isIncome = transaction.isIncome;
     final colorScheme = Theme.of(context).colorScheme;
-    final catColor = _getCategoryColor(transaction.category);
+    final catColor = CategoryStyles.colorFor(transaction.category);
 
     return Material(
       color: Colors.transparent,
@@ -172,7 +173,7 @@ class TransactionHistoryWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  _getCategoryIcon(transaction.category),
+                  CategoryStyles.iconFor(transaction.category),
                   size: 18,
                   color: catColor,
                 ),
@@ -218,55 +219,5 @@ class TransactionHistoryWidget extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getCategoryColor(String category) {
-    final name = category.toLowerCase();
-    if (name.contains('food') || name.contains('dining')) {
-      return const Color(0xFFFF9800);
-    }
-    if (name.contains('transport')) return const Color(0xFF42A5F5);
-    if (name.contains('shop')) return const Color(0xFFE91E63);
-    if (name.contains('bill') || name.contains('util')) {
-      return const Color(0xFF00BCD4);
-    }
-    if (name.contains('rent') || name.contains('house')) {
-      return const Color(0xFF5C6BC0);
-    }
-    if (name.contains('health') || name.contains('med')) {
-      return const Color(0xFFEC407A);
-    }
-    if (name.contains('entertain')) return const Color(0xFFAB47BC);
-    if (name.contains('salary') || name.contains('income')) {
-      return const Color(0xFF5B8DEF);
-    }
-    if (name.contains('grocery')) return const Color(0xFF66BB6A);
-    if (name.contains('travel')) return const Color(0xFF26C6DA);
-    return const Color(0xFF78909C);
-  }
-
-  IconData _getCategoryIcon(String category) {
-    final name = category.toLowerCase();
-    if (name.contains('food') || name.contains('dining')) {
-      return Icons.restaurant_rounded;
-    }
-    if (name.contains('transport')) return Icons.directions_car_rounded;
-    if (name.contains('shop')) return Icons.shopping_bag_rounded;
-    if (name.contains('bill') || name.contains('util')) {
-      return Icons.receipt_long_rounded;
-    }
-    if (name.contains('rent') || name.contains('house')) {
-      return Icons.home_rounded;
-    }
-    if (name.contains('health') || name.contains('med')) {
-      return Icons.medical_services_rounded;
-    }
-    if (name.contains('entertain')) return Icons.movie_rounded;
-    if (name.contains('salary') || name.contains('income')) {
-      return Icons.account_balance_rounded;
-    }
-    if (name.contains('grocery')) return Icons.local_grocery_store_rounded;
-    if (name.contains('travel')) return Icons.flight_rounded;
-    return Icons.category_rounded;
   }
 }

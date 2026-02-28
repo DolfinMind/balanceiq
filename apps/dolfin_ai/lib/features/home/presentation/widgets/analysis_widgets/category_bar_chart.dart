@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/di/injection_container.dart';
+import '../../../presentation/utils/category_styles.dart';
 
 class CategoryBarChart extends StatelessWidget {
   final Map<String, double> categories;
@@ -134,7 +135,7 @@ class CategoryBarChart extends StatelessWidget {
                       barRods: [
                         BarChartRodData(
                           toY: entry.value.value.abs(),
-                          color: _getCategoryColor(entry.value.key, entry.key),
+                          color: CategoryStyles.colorFor(entry.value.key),
                           width: 16,
                           borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(6)),
@@ -156,33 +157,5 @@ class CategoryBarChart extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getCategoryColor(String category, int index) {
-    final name = category.toLowerCase();
-    if (name.contains('food') || name.contains('dining')) {
-      return const Color(0xFFFF9800);
-    }
-    if (name.contains('transport')) return const Color(0xFF2196F3);
-    if (name.contains('shop')) return const Color(0xFFE91E63);
-    if (name.contains('bill') || name.contains('util')) {
-      return const Color(0xFF00BCD4);
-    }
-    if (name.contains('rent') || name.contains('house')) {
-      return const Color(0xFF3F51B5);
-    }
-    if (name.contains('health') || name.contains('med')) {
-      return const Color(0xFFF44336);
-    }
-    if (name.contains('entertain')) return const Color(0xFF9C27B0);
-
-    final colors = [
-      const Color(0xFF009688),
-      const Color(0xFFCDDC39),
-      const Color(0xFFFFC107),
-      const Color(0xFFFF5722),
-      const Color(0xFF03A9F4),
-    ];
-    return colors[index % colors.length];
   }
 }

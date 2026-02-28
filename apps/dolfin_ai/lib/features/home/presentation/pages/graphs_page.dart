@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../../core/di/injection_container.dart';
 import '../../domain/entities/dashbaord_summary.dart';
+import '../utils/category_styles.dart';
 import '../widgets/analysis_widgets/spending_trend_chart.dart';
 
 /// Analysis tab content – embeddable inside a parent Stack.
@@ -403,7 +404,7 @@ class GraphsPage extends StatelessWidget {
     final top = sorted.first;
     final total = sorted.fold<double>(0, (s, e) => s + e.value.abs());
     final pct = total > 0 ? (top.value.abs() / total * 100) : 0.0;
-    final topColor = _getCategoryColor(top.key, 0);
+    final topColor = CategoryStyles.colorFor(top.key);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -606,7 +607,7 @@ class GraphsPage extends StatelessWidget {
           final index = mapEntry.key;
           final entry = mapEntry.value;
           final pct = total > 0 ? (entry.value.abs() / total * 100) : 0.0;
-          final color = _getCategoryColor(entry.key, index);
+          final color = CategoryStyles.colorFor(entry.key);
 
           return Padding(
             padding: EdgeInsets.only(
@@ -763,37 +764,5 @@ class GraphsPage extends StatelessWidget {
         }).toList(),
       ),
     );
-  }
-
-  // ─── Category colors (shared) ───────────────────────────────
-
-  Color _getCategoryColor(String category, int index) {
-    final name = category.toLowerCase();
-    if (name.contains('food') || name.contains('dining')) {
-      return const Color(0xFF4CAF50);
-    }
-    if (name.contains('grocery')) return const Color(0xFFEF5350);
-    if (name.contains('transport')) return const Color(0xFF42A5F5);
-    if (name.contains('shop')) return const Color(0xFFFFA726);
-    if (name.contains('entertain')) return const Color(0xFFAB47BC);
-    if (name.contains('travel')) return const Color(0xFF5C6BC0);
-    if (name.contains('bill') ||
-        name.contains('util') ||
-        name.contains('recharge')) {
-      return const Color(0xFF26C6DA);
-    }
-    if (name.contains('rent') || name.contains('house')) {
-      return const Color(0xFF7E57C2);
-    }
-    if (name.contains('health') || name.contains('med')) {
-      return const Color(0xFFEC407A);
-    }
-    final colors = [
-      const Color(0xFFFFCA28),
-      const Color(0xFF66BB6A),
-      const Color(0xFFFF7043),
-      const Color(0xFF29B6F6),
-    ];
-    return colors[index % colors.length];
   }
 }

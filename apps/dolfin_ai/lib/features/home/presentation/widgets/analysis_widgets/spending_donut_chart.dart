@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:flutter/material.dart';
-
+import '../../../presentation/utils/category_styles.dart';
 import '../../../../../core/di/injection_container.dart';
 
 /// Spending donut chart with thick, rounded, separated segments.
@@ -37,14 +37,13 @@ class SpendingDonutChart extends StatelessWidget {
     );
 
     final segments = sortedEntries.asMap().entries.map((mapEntry) {
-      final index = mapEntry.key;
       final entry = mapEntry.value;
       final pct = total > 0 ? (entry.value.abs() / total * 100) : 0.0;
       return _DonutSegment(
         label: entry.key,
         value: entry.value.abs(),
         percentage: pct,
-        color: _getCategoryColor(entry.key, index),
+        color: CategoryStyles.colorFor(entry.key),
       );
     }).toList();
 
@@ -123,38 +122,6 @@ class SpendingDonutChart extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _getCategoryColor(String category, int index) {
-    final name = category.toLowerCase();
-    if (name.contains('food') || name.contains('dining')) {
-      return const Color(0xFF4CAF50);
-    }
-    if (name.contains('grocery')) return const Color(0xFFEF5350);
-    if (name.contains('transport')) return const Color(0xFF42A5F5);
-    if (name.contains('shop')) return const Color(0xFFFFA726);
-    if (name.contains('entertain')) return const Color(0xFFAB47BC);
-    if (name.contains('travel')) return const Color(0xFF5C6BC0);
-    if (name.contains('bill') ||
-        name.contains('util') ||
-        name.contains('recharge')) {
-      return const Color(0xFF26C6DA);
-    }
-    if (name.contains('rent') || name.contains('house')) {
-      return const Color(0xFF7E57C2);
-    }
-    if (name.contains('health') || name.contains('med')) {
-      return const Color(0xFFEC407A);
-    }
-    final colors = [
-      const Color(0xFFFFCA28),
-      const Color(0xFF66BB6A),
-      const Color(0xFFFF7043),
-      const Color(0xFF29B6F6),
-      const Color(0xFFD4E157),
-      const Color(0xFF8D6E63),
-    ];
-    return colors[index % colors.length];
   }
 }
 
