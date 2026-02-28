@@ -28,6 +28,7 @@ class CategoryBreakdownWidget extends StatelessWidget {
       ..sort((a, b) => b.value.abs().compareTo(a.value.abs()));
 
     final total = sorted.fold<double>(0, (sum, e) => sum + e.value.abs());
+    final top5 = sorted.take(5).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +51,7 @@ class CategoryBreakdownWidget extends StatelessWidget {
             ),
           ),
           child: Column(
-            children: sorted.asMap().entries.map((mapEntry) {
+            children: top5.asMap().entries.map((mapEntry) {
               final index = mapEntry.key;
               final entry = mapEntry.value;
               final pct = total > 0 ? (entry.value.abs() / total * 100) : 0.0;
@@ -67,7 +68,7 @@ class CategoryBreakdownWidget extends StatelessWidget {
                 },
                 child: Padding(
                   padding: EdgeInsets.only(
-                    bottom: index < sorted.length - 1 ? 14 : 0,
+                    bottom: index < top5.length - 1 ? 14 : 0,
                   ),
                   child: Column(
                     children: [

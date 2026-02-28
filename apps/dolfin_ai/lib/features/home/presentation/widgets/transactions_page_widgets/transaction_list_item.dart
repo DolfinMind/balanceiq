@@ -1,9 +1,7 @@
 import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:balance_iq/core/di/injection_container.dart';
-import 'package:balance_iq/core/icons/app_icons.dart';
-import 'package:dolfin_ui_kit/theme/app_palette.dart';
-import 'package:get_it/get_it.dart';
 import 'package:balance_iq/features/home/domain/entities/transaction.dart';
+import 'package:balance_iq/features/home/presentation/utils/category_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
@@ -24,9 +22,9 @@ class TransactionListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isIncome = transaction.isIncome;
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
+    final catColor = CategoryStyles.colorFor(transaction.category);
 
-    // Calculate staggered delay - cap at 6 items (was 10) to avoid long waits
     final staggerDelay = Duration(milliseconds: 20 * (index < 6 ? index : 6));
 
     return RepaintBoundary(
@@ -34,110 +32,67 @@ class TransactionListItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => onTap(transaction),
-          borderRadius: BorderRadius.circular(16),
-          splashColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-          highlightColor:
-              Theme.of(context).primaryColor.withValues(alpha: 0.05),
-          child: Ink(
-            padding: const EdgeInsets.all(16),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: isDark
-                  ? colorScheme.surface.withValues(alpha: 0.05)
-                  : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                if (!isDark)
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-              ],
+              color: catColor.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
+                // Category icon
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isIncome
-                        ? GetIt.instance<AppPalette>()
-                            .income
-                            .withValues(alpha: 0.1)
-                        : GetIt.instance<AppPalette>()
-                            .expense
-                            .withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(14),
+                    color: catColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: isIncome
-                      ? GetIt.I<AppIcons>().dashboard.income(
-                            size: 24,
-                            color: GetIt.instance<AppPalette>().income,
-                          )
-                      : GetIt.I<AppIcons>().dashboard.expense(
-                            size: 24,
-                            color: GetIt.instance<AppPalette>().expense,
-                          ),
+                  child: Icon(
+                    CategoryStyles.iconFor(transaction.category),
+                    size: 18,
+                    color: catColor,
+                  ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 10),
+
+                // Category + description
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         transaction.category,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
                       Text(
                         '${DateFormat('MMM d').format(transaction.transactionDate)} • ${transaction.description}',
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.color
-                                  ?.withValues(alpha: 0.7),
-                            ),
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          sl<CurrencyCubit>().formatAmountWithSign(
-                              transaction.amount,
-                              isIncome: isIncome),
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: isIncome
-                                        ? GetIt.instance<AppPalette>().income
-                                        : GetIt.instance<AppPalette>().expense,
-                                  ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 8),
-                    GetIt.I<AppIcons>().navigation.chevronRight(
-                          size: 20,
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.color
-                              ?.withValues(alpha: 0.3),
-                        ),
-                  ],
+
+                // Amount
+                Text(
+                  sl<CurrencyCubit>().formatAmountWithSign(transaction.amount,
+                      isIncome: isIncome),
+                  style: textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color:
+                        isIncome ? colorScheme.primary : colorScheme.onSurface,
+                  ),
                 ),
               ],
             ),

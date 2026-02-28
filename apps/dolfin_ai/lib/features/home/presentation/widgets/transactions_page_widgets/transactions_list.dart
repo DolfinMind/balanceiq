@@ -104,8 +104,7 @@ class TransactionsList extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 itemCount: transactionsState.transactions.length +
                     (transactionsState.isMoreLoading ? 1 : 0),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12),
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   if (index == transactionsState.transactions.length) {
                     return const Center(
