@@ -1,10 +1,7 @@
 import 'package:dolfin_core/currency/currency_cubit.dart';
 import 'package:balance_iq/core/di/injection_container.dart';
 import 'package:balance_iq/core/strings/dashboard_strings.dart';
-import 'package:balance_iq/core/icons/app_icons.dart';
-import 'package:dolfin_ui_kit/theme/app_palette.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get_it/get_it.dart';
 
 class BalanceCard extends StatelessWidget {
@@ -31,7 +28,7 @@ class BalanceCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // Net Balance Section — clean, flat
+          // Net Balance — large centered amount
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
@@ -60,107 +57,80 @@ class BalanceCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Income and Expense Cards — flat containers
-          Row(
-            children: [
-              Expanded(
-                child: _buildIncomeExpenseCard(
-                  context,
-                  currencyCubit: currencyCubit,
-                  iconWidget: GetIt.I<AppIcons>().dashboard.income(size: 14),
-                  label: GetIt.I<DashboardStrings>().totalIncome,
-                  amount: totalIncome,
-                  isIncome: true,
-                ),
+          // Single card: Total Balance | Total Expense
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+                width: 1,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildIncomeExpenseCard(
-                  context,
-                  currencyCubit: currencyCubit,
-                  iconWidget: GetIt.I<AppIcons>().dashboard.expense(size: 14),
-                  label: GetIt.I<DashboardStrings>().totalExpense,
-                  amount: totalExpense,
-                  isIncome: false,
-                ),
+            ),
+            child: IntrinsicHeight(
+              child: Row(
+                children: [
+                  // Left: Total Income
+                  Expanded(
+                    child: _buildHalf(
+                      context,
+                      label: GetIt.I<DashboardStrings>().totalIncome,
+                      amount: currencyCubit.formatAmount(totalIncome),
+                    ),
+                  ),
+                  // Vertical divider
+                  Container(
+                    width: 1,
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                  ),
+                  // Right: Total Expense
+                  Expanded(
+                    child: _buildHalf(
+                      context,
+                      label: GetIt.I<DashboardStrings>().totalExpense,
+                      amount: currencyCubit.formatAmount(totalExpense),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildIncomeExpenseCard(
+  Widget _buildHalf(
     BuildContext context, {
-    required CurrencyCubit currencyCubit,
-    required Widget iconWidget,
     required String label,
-    required double amount,
-    required bool isIncome,
+    required String amount,
   }) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    final iconColor = isIncome
-        ? GetIt.instance<AppPalette>().income
-        : GetIt.instance<AppPalette>().expense;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
-          width: 1,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          label,
+          style: textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurfaceVariant,
+            letterSpacing: 0.3,
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 24,
-                height: 24,
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: ColorFiltered(
-                  colorFilter: ColorFilter.mode(
-                    iconColor,
-                    BlendMode.srcIn,
-                  ),
-                  child: iconWidget,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurfaceVariant,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ],
+        const SizedBox(height: 8),
+        Text(
+          amount,
+          style: textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
+            color: colorScheme.onSurface,
           ),
-          const SizedBox(height: 8),
-          Text(
-            currencyCubit.formatAmount(amount),
-            style: textTheme.titleLarge?.copyWith(
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.8,
-              color: colorScheme.onSurface,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
