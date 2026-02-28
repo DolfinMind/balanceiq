@@ -185,8 +185,11 @@ class DashboardLayout extends StatelessWidget {
           right: 0,
           bottom: 0,
           child: Hero(
-            tag: 'chat_input',
-            child: FloatingChatButton(onReturn: onChatReturn),
+            tag: 'bottom_nav',
+            child: FloatingBottomNav(
+              onDashboardRefresh: onChatReturn,
+              onViewAllTransactions: onViewAll,
+            ),
           ),
         ),
       ],
