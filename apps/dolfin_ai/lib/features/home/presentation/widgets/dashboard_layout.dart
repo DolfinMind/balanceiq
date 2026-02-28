@@ -20,6 +20,7 @@ class DashboardLayout extends StatelessWidget {
   final VoidCallback onTapDateRange;
   final VoidCallback onViewAll;
   final VoidCallback? onChatReturn;
+  final VoidCallback? onNavigateToGraphs;
   final String profileUrl;
   final String userName;
   final String displayDate;
@@ -33,6 +34,7 @@ class DashboardLayout extends StatelessWidget {
     required this.onTapDateRange,
     required this.onViewAll,
     this.onChatReturn,
+    this.onNavigateToGraphs,
     required this.profileUrl,
     required this.userName,
     required this.displayDate,
@@ -189,7 +191,7 @@ class DashboardLayout extends StatelessWidget {
             tag: 'bottom_nav',
             child: FloatingBottomNav(
               onDashboardRefresh: onChatReturn,
-              onViewAllTransactions: onViewAll,
+              onNavigateToGraphs: onNavigateToGraphs,
             ),
           ),
         ),

@@ -7,15 +7,19 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'add_transaction_bottom_sheet.dart';
 
 /// Modern frosted glass floating bottom navigation bar.
-/// Three icon-only items: Home (left, initially selected), Chat (center), Add (right).
+/// Four icon-only items: Home (0), Chat (1), Graphs (2), Add (3).
 class FloatingBottomNav extends StatefulWidget {
   final VoidCallback? onDashboardRefresh;
-  final VoidCallback? onViewAllTransactions;
+  final VoidCallback? onNavigateToGraphs;
+  final VoidCallback? onNavigateHome;
+  final int initialIndex;
 
   const FloatingBottomNav({
     super.key,
     this.onDashboardRefresh,
-    this.onViewAllTransactions,
+    this.onNavigateToGraphs,
+    this.onNavigateHome,
+    this.initialIndex = 0,
   });
 
   @override
@@ -23,7 +27,13 @@ class FloatingBottomNav extends StatefulWidget {
 }
 
 class _FloatingBottomNavState extends State<FloatingBottomNav> {
-  int _selectedIndex = 0; // Home selected initially
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   void _navigateToChat() async {
     setState(() => _selectedIndex = 1);
@@ -36,12 +46,12 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         ),
       ),
     );
-    setState(() => _selectedIndex = 0);
+    if (mounted) setState(() => _selectedIndex = widget.initialIndex);
     widget.onDashboardRefresh?.call();
   }
 
   void _showAddTransactionSheet() {
-    setState(() => _selectedIndex = 2);
+    setState(() => _selectedIndex = 3);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -52,8 +62,20 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         },
       ),
     ).whenComplete(() {
-      if (mounted) setState(() => _selectedIndex = 0);
+      if (mounted) setState(() => _selectedIndex = widget.initialIndex);
     });
+  }
+
+  void _onTapHome() {
+    if (_selectedIndex == 0) return;
+    setState(() => _selectedIndex = 0);
+    widget.onNavigateHome?.call();
+  }
+
+  void _onTapGraphs() {
+    if (_selectedIndex == 2) return;
+    setState(() => _selectedIndex = 2);
+    widget.onNavigateToGraphs?.call();
   }
 
   @override
@@ -62,7 +84,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 36, vertical: 16),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
@@ -97,7 +119,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                   icon: LucideIcons.house,
                   colorScheme: colorScheme,
                   isDark: isDark,
-                  onTap: () => setState(() => _selectedIndex = 0),
+                  onTap: _onTapHome,
                 ),
                 _navIcon(
                   index: 1,
@@ -108,6 +130,13 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                 ),
                 _navIcon(
                   index: 2,
+                  icon: LucideIcons.chartLine,
+                  colorScheme: colorScheme,
+                  isDark: isDark,
+                  onTap: _onTapGraphs,
+                ),
+                _navIcon(
+                  index: 3,
                   icon: LucideIcons.plus,
                   colorScheme: colorScheme,
                   isDark: isDark,

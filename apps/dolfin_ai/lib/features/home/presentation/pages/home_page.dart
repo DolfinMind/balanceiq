@@ -16,6 +16,7 @@ import '../cubit/transactions_cubit.dart';
 import '../widgets/calendar_widgets/date_selector_bottom_sheet.dart';
 import '../widgets/dashboard_layout.dart';
 import 'error_page.dart';
+import 'graphs_page.dart';
 import 'welcome_page.dart';
 import '../widgets/calendar_widgets/custom_calendar_date_range_picker.dart';
 
@@ -355,6 +356,17 @@ class _DashboardViewState extends State<DashboardView> {
                       },
                       onViewAll: _onViewAllTransactions,
                       onChatReturn: _loadDashboard,
+                      onNavigateToGraphs: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => GraphsPage(
+                              summary: summary,
+                              onDashboardRefresh: _loadDashboard,
+                            ),
+                          ),
+                        );
+                      },
                       profileUrl: _profileUrl ?? '',
                       userName: _userName,
                       displayDate: _getFormattedDateRange(),
