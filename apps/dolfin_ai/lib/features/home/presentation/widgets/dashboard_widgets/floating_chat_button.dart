@@ -87,7 +87,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 36, vertical: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 36, vertical: 28),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
@@ -131,9 +131,8 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                   isDark: isDark,
                   onTap: () => _onTapTab(1),
                 ),
-                _navIcon(
+                _appIconButton(
                   index: 2,
-                  icon: LucideIcons.messageCircle,
                   colorScheme: colorScheme,
                   isDark: isDark,
                   onTap: _navigateToChat,
@@ -183,6 +182,42 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
               : isDark
                   ? Colors.white.withValues(alpha: 0.55)
                   : colorScheme.onSurface.withValues(alpha: 0.45),
+        ),
+      ),
+    );
+  }
+
+  Widget _appIconButton({
+    required int index,
+    required ColorScheme colorScheme,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    final isSelected = _visualIndex == index;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: isSelected
+              ? colorScheme.primary.withValues(alpha: 0.15)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/icons/app_icon.png',
+              width: 24,
+              height: 24,
+              opacity: AlwaysStoppedAnimation(isSelected ? 1.0 : 0.55),
+            ),
+          ),
         ),
       ),
     );
