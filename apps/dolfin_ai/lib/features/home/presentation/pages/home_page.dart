@@ -18,7 +18,6 @@ import '../widgets/dashboard_layout.dart';
 import '../widgets/dashboard_widgets/floating_chat_button.dart';
 import 'error_page.dart';
 import 'graphs_page.dart';
-import 'welcome_page.dart';
 import '../widgets/calendar_widgets/custom_calendar_date_range_picker.dart';
 
 class HomePage extends StatelessWidget {
@@ -311,13 +310,6 @@ class _DashboardViewState extends State<DashboardView> {
                   }
 
                   if (state is DashboardError) {
-                    if (state.message.contains('No dashboard data')) {
-                      return WelcomePage(
-                        userName: _userName,
-                        onGetStarted: _loadDashboard,
-                      );
-                    }
-
                     // Check if error is authentication-related
                     final isAuthError =
                         state.message.toLowerCase().contains('unauthorized') ||

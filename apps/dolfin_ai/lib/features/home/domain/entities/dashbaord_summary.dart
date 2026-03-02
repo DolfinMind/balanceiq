@@ -59,6 +59,30 @@ class DashboardSummary extends Equatable {
     required this.onboarded,
   });
 
+  factory DashboardSummary.empty() {
+    return const DashboardSummary(
+      totalIncome: 0.0,
+      totalExpense: 0.0,
+      netBalance: 0.0,
+      expenseRatio: 0.0,
+      savingsRate: 0.0,
+      spendingTrend: [],
+      categories: {},
+      accountsBreakdown: {},
+      biggestExpenseAmount: 0.0,
+      biggestExpenseDescription: '',
+      expenseCategory: '',
+      expenseAccount: '',
+      biggestCategoryName: '',
+      biggestCategoryAmount: 0.0,
+      biggestIncomeAmount: 0.0,
+      biggestIncomeDescription: '',
+      period: '',
+      daysRemainingInMonth: 0,
+      onboarded: true,
+    );
+  }
+
   @override
   List<Object?> get props => [
         totalIncome,

@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/usecase/get_user_dashbaord.dart';
+import '../../domain/entities/dashbaord_summary.dart';
 import 'dashboard_state.dart';
 
 class DashboardCubit extends Cubit<DashboardState> {
@@ -53,7 +54,13 @@ class DashboardCubit extends Cubit<DashboardState> {
     );
 
     result.fold(
-      (failure) => emit(DashboardError(failure.message)),
+      (failure) {
+        if (failure.message.contains('No dashboard data')) {
+          emit(DashboardLoaded(DashboardSummary.empty()));
+        } else {
+          emit(DashboardError(failure.message));
+        }
+      },
       (summary) => emit(DashboardLoaded(summary)),
     );
   }
