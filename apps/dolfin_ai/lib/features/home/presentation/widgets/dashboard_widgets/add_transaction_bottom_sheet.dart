@@ -389,88 +389,76 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: EdgeInsets.only(
-            top: 12,
-            bottom: 24 + bottomPadding,
-            left: 20,
-            right: 20,
-          ),
-          decoration: BoxDecoration(
-            color: Theme.of(context)
-                .scaffoldBackgroundColor
-                .withValues(alpha: 0.8),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
-              width: 1,
-            ),
-          ),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Handle bar
-                  Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      width: 48,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.secondary,
-                        ]),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
+    return Container(
+      padding: EdgeInsets.only(
+        top: 12,
+        bottom: 24 + bottomPadding,
+        left: 20,
+        right: 20,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .outlineVariant
+                        .withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-
-                  // Title
-                  Text(
-                    'Add Transaction',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Transaction Type Toggle
-                  _buildTransactionTypeToggle(context),
-                  const SizedBox(height: 20),
-
-                  // Amount Field
-                  _buildAmountField(context),
-                  const SizedBox(height: 16),
-
-                  // Category Dropdown
-                  _buildCategoryDropdown(context),
-                  const SizedBox(height: 16),
-
-                  // Custom Category Field (if selected)
-                  if (_isCustomCategory) ...[
-                    _buildCustomCategoryField(context),
-                    const SizedBox(height: 16),
-                  ],
-
-                  // Date Picker
-                  _buildDatePicker(context),
-                  const SizedBox(height: 24),
-
-                  // Submit Button
-                  _buildSubmitButton(context),
-                ],
+                ),
               ),
-            ),
+
+              // Title
+              Text(
+                'Add Transaction',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              // Transaction Type Toggle
+              _buildTransactionTypeToggle(context),
+              const SizedBox(height: 20),
+
+              // Amount Field
+              _buildAmountField(context),
+              const SizedBox(height: 16),
+
+              // Category Dropdown
+              _buildCategoryDropdown(context),
+              const SizedBox(height: 16),
+
+              // Custom Category Field (if selected)
+              if (_isCustomCategory) ...[
+                _buildCustomCategoryField(context),
+                const SizedBox(height: 16),
+              ],
+
+              // Date Picker
+              _buildDatePicker(context),
+              const SizedBox(height: 24),
+
+              // Submit Button
+              _buildSubmitButton(context),
+            ],
           ),
         ),
       ),

@@ -97,8 +97,8 @@ class _CustomCalendarDateRangePickerState
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(32),
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(28),
           border: Border.all(
             color: isDark
                 ? Colors.white.withValues(alpha: 0.1)
@@ -107,46 +107,37 @@ class _CustomCalendarDateRangePickerState
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.2),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.15),
               blurRadius: 24,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: isDark ? 10 : 0,
-              sigmaY: isDark ? 10 : 0,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header with month navigation
-                  _buildHeader(context, isDark),
-                  const SizedBox(height: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with month navigation
+              _buildHeader(context, isDark),
+              const SizedBox(height: 24),
 
-                  // Calendar month view
-                  CalendarMonthView(
-                    displayedMonth: _displayedMonth,
-                    startDate: _startDate,
-                    endDate: _endDate,
-                    today: DateTime.now(),
-                    onDateSelected: _onDateSelected,
-                    minDate: widget.minDate,
-                    maxDate: widget.maxDate,
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Footer with range preview and actions
-                  _buildFooter(context, isDark),
-                ],
+              // Calendar month view
+              CalendarMonthView(
+                displayedMonth: _displayedMonth,
+                startDate: _startDate,
+                endDate: _endDate,
+                today: DateTime.now(),
+                onDateSelected: _onDateSelected,
+                minDate: widget.minDate,
+                maxDate: widget.maxDate,
               ),
-            ),
+
+              const SizedBox(height: 24),
+
+              // Footer with range preview and actions
+              _buildFooter(context, isDark),
+            ],
           ),
         ),
       ),

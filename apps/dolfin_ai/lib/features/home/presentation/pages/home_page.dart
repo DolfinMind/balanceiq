@@ -417,7 +417,7 @@ class _DashboardViewState extends State<DashboardView> {
     return Dialog(
       backgroundColor: colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         side: BorderSide(
           color: colorScheme.outlineVariant.withValues(alpha: 0.2),
           width: 1,

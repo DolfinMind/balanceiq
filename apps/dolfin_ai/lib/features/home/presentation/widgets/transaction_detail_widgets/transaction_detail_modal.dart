@@ -141,7 +141,7 @@ class _TransactionDetailModalState extends State<TransactionDetailModal> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Row(
           children: [
             Container(
@@ -232,111 +232,95 @@ class _TransactionDetailModalState extends State<TransactionDetailModal> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context)
-                    .scaffoldBackgroundColor
-                    .withValues(alpha: 0.85),
-                Theme.of(context)
-                    .scaffoldBackgroundColor
-                    .withValues(alpha: 0.75),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
-              width: 1,
-            ),
-          ),
-          child: _isDeleting
-              ? SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const CircularProgressIndicator(),
-                        const SizedBox(height: 16),
-                        Text(
-                          AppStrings.transactions.deleting,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Handle bar
-                        Container(
-                          margin: const EdgeInsets.only(top: 12),
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).dividerColor,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-
-                        // Header
-                        DetailHeader(
-                          isIncome: widget.transaction.isIncome,
-                          isEditMode: _isEditMode,
-                          transactionId:
-                              widget.transaction.transactionId.toString(),
-                          onToggleEdit: _toggleEditMode,
-                        ),
-
-                        // Content
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: _isEditMode
-                              ? EditTransactionForm(
-                                  amountController: _amountController,
-                                  descriptionController: _descriptionController,
-                                  selectedType: _selectedType,
-                                  selectedCategory: _selectedCategory,
-                                  selectedDate: _selectedDate,
-                                  categories: _categories,
-                                  onTypeChanged: (type) =>
-                                      setState(() => _selectedType = type),
-                                  onCategoryChanged: (category) => setState(
-                                      () => _selectedCategory = category),
-                                  onDateSelect: _selectDate,
-                                )
-                              : _buildDetailContent(),
-                        ),
-
-                        // Action buttons
-                        DetailActionButtons(
-                          isEditMode: _isEditMode,
-                          onDelete: _handleDelete,
-                          onSaveOrEdit:
-                              _isEditMode ? _handleUpdate : _toggleEditMode,
-                        ),
-
-                        // Safe area padding
-                        SizedBox(height: MediaQuery.of(context).padding.bottom),
-                      ],
-                    ),
-                  ),
-                ),
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
+      child: _isDeleting
+          ? SizedBox(
+              height: 200,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      AppStrings.transactions.deleting,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Handle bar
+                    Center(
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 12, bottom: 20),
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .outlineVariant
+                              .withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+
+                    // Header
+                    DetailHeader(
+                      isIncome: widget.transaction.isIncome,
+                      isEditMode: _isEditMode,
+                      transactionId:
+                          widget.transaction.transactionId.toString(),
+                      onToggleEdit: _toggleEditMode,
+                    ),
+
+                    // Content
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: _isEditMode
+                          ? EditTransactionForm(
+                              amountController: _amountController,
+                              descriptionController: _descriptionController,
+                              selectedType: _selectedType,
+                              selectedCategory: _selectedCategory,
+                              selectedDate: _selectedDate,
+                              categories: _categories,
+                              onTypeChanged: (type) =>
+                                  setState(() => _selectedType = type),
+                              onCategoryChanged: (category) =>
+                                  setState(() => _selectedCategory = category),
+                              onDateSelect: _selectDate,
+                            )
+                          : _buildDetailContent(),
+                    ),
+
+                    // Action buttons
+                    DetailActionButtons(
+                      isEditMode: _isEditMode,
+                      onDelete: _handleDelete,
+                      onSaveOrEdit:
+                          _isEditMode ? _handleUpdate : _toggleEditMode,
+                    ),
+
+                    // Safe area padding
+                    SizedBox(height: MediaQuery.of(context).padding.bottom),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
