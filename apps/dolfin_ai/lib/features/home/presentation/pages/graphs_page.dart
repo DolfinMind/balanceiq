@@ -6,6 +6,11 @@ import '../../../../../core/di/injection_container.dart';
 import '../../domain/entities/dashbaord_summary.dart';
 import '../utils/category_styles.dart';
 import '../widgets/analysis_widgets/spending_trend_chart.dart';
+import '../widgets/analysis_widgets/pacing_card_widget.dart';
+import '../widgets/analysis_widgets/estimated_runway_card.dart';
+import '../widgets/dashboard_widgets/highlights_insight_card.dart';
+import '../widgets/analysis_widgets/category_radar_chart.dart';
+import '../widgets/analysis_widgets/spending_heatmap_widget.dart';
 
 /// Analysis tab content – embeddable inside a parent Stack.
 /// No Scaffold, AppBar, or FloatingBottomNav – those live in the parent.
@@ -91,9 +96,39 @@ class GraphsPage extends StatelessWidget {
           _buildFinancialHealth(context, colorScheme, textTheme),
           const SizedBox(height: 28),
 
-          // ─── 2. Top Spending Insight ────────────────────
-          if (summary.categories.isNotEmpty) ...[
-            _buildTopSpendingInsight(context, colorScheme, textTheme),
+          // ─── 2. Top Insights & Projections ──────────────
+          if (summary.categories.isNotEmpty || summary.totalExpense > 0) ...[
+            _sectionTitle(context, 'Key Insights'),
+            const SizedBox(height: 12),
+            if (summary.categories.isNotEmpty) ...[
+              _buildTopSpendingInsight(context, colorScheme, textTheme),
+              const SizedBox(height: 12),
+            ],
+            // Pacing Card
+            SpendingPacingCard(
+              totalIncome: summary.totalIncome,
+              totalExpense: summary.totalExpense,
+              daysInPeriod: summary.daysRemainingInMonth > 0
+                  ? 30
+                  : 30, // Rough estimate if not available accurately from summary
+            ),
+            const SizedBox(height: 12),
+
+            // Runway Card
+            EstimatedRunwayCard(
+              netBalance: summary.netBalance,
+              totalExpense: summary.totalExpense,
+              daysInPeriod: 30, // Normalized to monthly velocity
+            ),
+            const SizedBox(height: 12),
+
+            // Biggest Income/Expense Highlights
+            HighlightsInsightCard(
+              biggestIncomeAmount: summary.biggestIncomeAmount,
+              biggestIncomeDescription: summary.biggestIncomeDescription,
+              biggestExpenseAmount: summary.biggestExpenseAmount,
+              biggestExpenseDescription: summary.biggestExpenseDescription,
+            ),
             const SizedBox(height: 28),
           ],
 
@@ -102,6 +137,10 @@ class GraphsPage extends StatelessWidget {
             _sectionTitle(context, 'Spending Trend'),
             const SizedBox(height: 12),
             SpendingTrendChart(
+              spendingTrend: summary.spendingTrend,
+            ),
+            const SizedBox(height: 16),
+            SpendingHeatmapWidget(
               spendingTrend: summary.spendingTrend,
             ),
             const SizedBox(height: 28),
@@ -118,6 +157,8 @@ class GraphsPage extends StatelessWidget {
 
           // ─── 5. Category Breakdown ─────────────────────
           if (summary.categories.isNotEmpty) ...[
+            CategoryRadarChart(categories: summary.categories),
+            const SizedBox(height: 28),
             _sectionTitle(context, 'Spending by Category'),
             const SizedBox(height: 12),
             _buildCategoryBreakdown(
@@ -253,57 +294,144 @@ class GraphsPage extends StatelessWidget {
     );
   }
 
-  // ─── 1. Financial Health ────────────────────────────────────
-
   Widget _buildFinancialHealth(
     BuildContext context,
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    // Budget utilization — how much of income is consumed by expenses
+    // 1. Savings Rate
+    final savingsRate = summary.savingsRate;
+
+    // 2. Cash Flow Ratio = Income / Expense
+    final cashFlowRatio = summary.totalExpense > 0
+        ? (summary.totalIncome / summary.totalExpense)
+        : (summary.totalIncome > 0 ? 5.0 : 0.0);
+
+    // 3. Financial Cushion = Net Balance / Average Daily Expense
+    final dailyExpense = summary.totalExpense / 30; // normalized to 30 days
+    final cushionDays =
+        dailyExpense > 0 ? (summary.netBalance / dailyExpense) : 0.0;
+
+    // 4. Daily Burn Rate
+    final burnRate = dailyExpense;
+
+    // 5. Expense Concentration
+    double maxCategoryExpense = 0.0;
+    if (summary.categories.isNotEmpty) {
+      maxCategoryExpense = summary.categories.values
+          .map((v) => v.abs())
+          .reduce((a, b) => a > b ? a : b);
+    }
+    final expenseConcentration = summary.totalExpense > 0
+        ? (maxCategoryExpense / summary.totalExpense) * 100
+        : 0.0;
+
+    // 6. Budget Utilization (Expense Ratio)
     final budgetUtil = summary.totalIncome > 0
         ? (summary.totalExpense / summary.totalIncome * 100).clamp(0.0, 200.0)
         : 0.0;
 
-    return Row(
+    final currencyCubit = sl<CurrencyCubit>();
+
+    return Column(
       children: [
-        // Expense Ratio
-        Expanded(
-          child: _buildGaugeCard(
-            context,
-            colorScheme: colorScheme,
-            textTheme: textTheme,
-            label: 'Expense Ratio',
-            value: summary.expenseRatio / 100,
-            displayValue: '${summary.expenseRatio.toStringAsFixed(0)}%',
-            color: _getRatioColor(summary.expenseRatio),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: _buildGaugeCard(
+                context,
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+                label: 'Budget Used',
+                value: (budgetUtil / 100).clamp(0.0, 1.0),
+                displayValue: '${budgetUtil.toStringAsFixed(0)}%',
+                color: _getSavingsColor(
+                    100 - budgetUtil), // Invert for color (high budget = bad)
+                description:
+                    'The percentage of your income consumed by expenses. Keeping this low gives you more financial breathing room.',
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildGaugeCard(
+                context,
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+                label: 'Savings Rate',
+                value: savingsRate / 100,
+                displayValue: '${savingsRate.toStringAsFixed(0)}%',
+                color: _getSavingsColor(savingsRate),
+                description:
+                    'The percentage of your income that you saved instead of spent over this period. Higher is better for building wealth.',
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildGaugeCard(
+                context,
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+                label: 'Cash Flow',
+                value: (cashFlowRatio / 2.0).clamp(0.0, 1.0),
+                displayValue: '${cashFlowRatio.toStringAsFixed(1)}x',
+                color: _getCashFlowColor(cashFlowRatio),
+                description:
+                    'The ratio of your income to expenses. A score of 1.0x means you broke even. Above 1.0x means you are cash-flow positive.',
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 12),
-        // Savings Rate
-        Expanded(
-          child: _buildGaugeCard(
-            context,
-            colorScheme: colorScheme,
-            textTheme: textTheme,
-            label: 'Savings Rate',
-            value: summary.savingsRate / 100,
-            displayValue: '${summary.savingsRate.toStringAsFixed(0)}%',
-            color: _getSavingsColor(summary.savingsRate),
-          ),
-        ),
-        const SizedBox(width: 12),
-        // Budget Utilization (replaces Days Left)
-        Expanded(
-          child: _buildGaugeCard(
-            context,
-            colorScheme: colorScheme,
-            textTheme: textTheme,
-            label: 'Budget Used',
-            value: (budgetUtil / 100).clamp(0.0, 1.0),
-            displayValue: '${budgetUtil.toStringAsFixed(0)}%',
-            color: _getBudgetColor(budgetUtil),
-          ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: _buildGaugeCard(
+                context,
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+                label: 'Cushion',
+                value: (cushionDays / 180.0).clamp(0.0, 1.0),
+                displayValue: cushionDays > 30
+                    ? '${(cushionDays / 30).toStringAsFixed(1)}m'
+                    : '${cushionDays.toStringAsFixed(0)}d',
+                color: _getCushionColor(cushionDays),
+                description:
+                    'How long your current net balance covers your average daily expenses. E.g. "2.5m" means your savings could sustain your lifestyle for 2.5 months without income.',
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildGaugeCard(
+                context,
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+                label: 'Burn Rate',
+                value:
+                    (burnRate / 500).clamp(0.0, 1.0), // Arbitrary gauge scale
+                displayValue:
+                    currencyCubit.formatAmount(burnRate).split('.').first,
+                color: colorScheme.error,
+                description:
+                    'Your average daily spending over the last 30 days. This measures how fast you "burn" through cash. A lower burn rate extends your financial runway.',
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildGaugeCard(
+                context,
+                colorScheme: colorScheme,
+                textTheme: textTheme,
+                label: 'Discipline',
+                value: (1 - (expenseConcentration / 100)).clamp(
+                    0.0, 1.0), // Invert so low concentration = full gauge
+                displayValue: '${expenseConcentration.toStringAsFixed(0)}%',
+                color: _getSavingsColor(
+                    100 - expenseConcentration), // Re-use savings color logic
+                description:
+                    'Expense Concentration: The percentage of your total spending consumed by your single highest category. High concentration indicates risk if that top category is discretionary.',
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -317,63 +445,206 @@ class GraphsPage extends StatelessWidget {
     required double value,
     required String displayValue,
     required Color color,
+    required String description,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showMetricDetailsModal(
+          context,
+          title: label,
+          value: displayValue,
+          description: description,
+          color: color,
+        ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Column(
+            children: [
+              SizedBox(
+                width: 52,
+                height: 52,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      value: value.clamp(0, 1),
+                      strokeWidth: 5,
+                      backgroundColor:
+                          colorScheme.outlineVariant.withValues(alpha: 0.15),
+                      valueColor: AlwaysStoppedAnimation(color),
+                      strokeCap: StrokeCap.round,
+                    ),
+                    Text(
+                      displayValue,
+                      style: textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 10,
+                        color: color,
+                      ),
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      label,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.info_outline,
+                    size: 11,
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-      child: Column(
-        children: [
-          SizedBox(
-            width: 52,
-            height: 52,
-            child: Stack(
-              alignment: Alignment.center,
+    );
+  }
+
+  void _showMetricDetailsModal(
+    BuildContext context, {
+    required String title,
+    required String value,
+    required String description,
+    required Color color,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        final colorScheme = Theme.of(ctx).colorScheme;
+        final textTheme = Theme.of(ctx).textTheme;
+        return Container(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainer,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircularProgressIndicator(
-                  value: value.clamp(0, 1),
-                  strokeWidth: 5,
-                  backgroundColor:
-                      colorScheme.outlineVariant.withValues(alpha: 0.15),
-                  valueColor: AlwaysStoppedAnimation(color),
-                  strokeCap: StrokeCap.round,
+                Center(
+                  child: Container(
+                    width: 48,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color:
+                          colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.analytics_outlined,
+                          color: color, size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            value,
+                            style: textTheme.headlineSmall?.copyWith(
+                              color: color,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
                 Text(
-                  displayValue,
-                  style: textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 11,
-                    color: color,
+                  'What does this mean?',
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  description,
+                  style: textTheme.bodyLarge?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colorScheme.primaryContainer,
+                      foregroundColor: colorScheme.onPrimaryContainer,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text('Got it, thanks!',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-              fontSize: 10,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Color _getRatioColor(double ratio) {
-    if (ratio <= 50) return const Color(0xFF4CAF50);
-    if (ratio <= 75) return const Color(0xFFFFA726);
+  Color _getCashFlowColor(double ratio) {
+    if (ratio >= 1.2) return const Color(0xFF4CAF50);
+    if (ratio >= 1.0) return const Color(0xFFFFA726);
     return const Color(0xFFEF5350);
   }
 
@@ -383,9 +654,9 @@ class GraphsPage extends StatelessWidget {
     return const Color(0xFFEF5350);
   }
 
-  Color _getBudgetColor(double utilization) {
-    if (utilization <= 60) return const Color(0xFF4CAF50);
-    if (utilization <= 85) return const Color(0xFFFFA726);
+  Color _getCushionColor(double days) {
+    if (days >= 90) return const Color(0xFF4CAF50);
+    if (days >= 30) return const Color(0xFFFFA726);
     return const Color(0xFFEF5350);
   }
 
@@ -534,6 +805,39 @@ class GraphsPage extends StatelessWidget {
               ),
             ],
           ),
+
+          if (summary.totalIncome > 0 || summary.totalExpense > 0) ...[
+            const SizedBox(height: 16),
+            Divider(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+                height: 1),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(
+                  summary.totalIncome >= summary.totalExpense
+                      ? LucideIcons.trendingUp
+                      : LucideIcons.trendingDown,
+                  size: 16,
+                  color: summary.totalIncome >= summary.totalExpense
+                      ? const Color(0xFF4CAF50)
+                      : const Color(0xFFEF5350),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    summary.totalIncome >= summary.totalExpense
+                        ? 'You saved ${(incomeRatio * 100).toStringAsFixed(0)}% of your income this period.'
+                        : 'You spent ${currencyCubit.formatAmount(summary.totalExpense - summary.totalIncome)} more than you earned.',
+                    style: textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

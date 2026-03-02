@@ -220,7 +220,21 @@ class SpendingTrendChart extends StatelessWidget {
               height: 200,
               child: LineChart(
                 LineChartData(
-                  gridData: const FlGridData(show: false),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: maxAmount > 0
+                        ? (maxAmount / 4 == 0 ? 1 : maxAmount / 4)
+                        : 25,
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        color:
+                            colorScheme.outlineVariant.withValues(alpha: 0.2),
+                        strokeWidth: 1,
+                        dashArray: [4, 4],
+                      );
+                    },
+                  ),
                   titlesData: FlTitlesData(
                     show: true,
                     rightTitles: const AxisTitles(
@@ -320,7 +334,14 @@ class SpendingTrendChart extends StatelessWidget {
                       ),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: colorScheme.primary.withValues(alpha: 0.08),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            colorScheme.primary.withValues(alpha: 0.4),
+                            colorScheme.primary.withValues(alpha: 0.0),
+                          ],
+                        ),
                       ),
                     ),
                   ],
