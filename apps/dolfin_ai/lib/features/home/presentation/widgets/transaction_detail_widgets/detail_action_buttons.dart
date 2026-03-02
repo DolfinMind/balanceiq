@@ -21,27 +21,29 @@ class DetailActionButtons extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          Expanded(
-            child: OutlinedButton.icon(
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
               onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline, size: 20),
-              label: Text(AppStrings.common.delete),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-                side: BorderSide(color: Theme.of(context).colorScheme.error),
-                padding: const EdgeInsets.symmetric(vertical: 14),
+              icon: const Icon(Icons.delete_outline),
+              color: Theme.of(context).colorScheme.error,
+              padding: const EdgeInsets.all(14),
+              constraints: const BoxConstraints(),
+              style: IconButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-            )
-                .animate()
-                .fadeIn(delay: 400.ms, duration: 300.ms)
-                .slideY(begin: 0.2, end: 0, delay: 400.ms, duration: 300.ms),
-          ),
+            ),
+          )
+              .animate()
+              .fadeIn(delay: 400.ms, duration: 300.ms)
+              .slideY(begin: 0.2, end: 0, delay: 400.ms, duration: 300.ms),
           const SizedBox(width: 16),
           Expanded(
-            flex: 2,
             child: ElevatedButton.icon(
               onPressed: onSaveOrEdit,
               icon: Icon(isEditMode ? Icons.check : Icons.edit, size: 20),

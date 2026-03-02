@@ -8,6 +8,9 @@ class DetailHeader extends StatelessWidget {
   final String transactionId;
   final VoidCallback onToggleEdit;
 
+  static const Color _incomeColor = Color(0xFF10b981);
+  static const Color _expenseColor = Color(0xFFef4444);
+
   const DetailHeader({
     super.key,
     required this.isIncome,
@@ -26,13 +29,13 @@ class DetailHeader extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isIncome
-                  ? Colors.green.withValues(alpha: 0.1)
-                  : Colors.red.withValues(alpha: 0.1),
+                  ? _incomeColor.withValues(alpha: 0.1)
+                  : _expenseColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               isIncome ? Icons.arrow_downward : Icons.arrow_upward,
-              color: isIncome ? Colors.green : Colors.red,
+              color: isIncome ? _incomeColor : _expenseColor,
               size: 28,
             ),
           ).animate().fadeIn(duration: 300.ms).scale(

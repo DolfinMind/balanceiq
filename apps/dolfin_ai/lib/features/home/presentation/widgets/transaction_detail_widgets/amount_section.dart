@@ -9,6 +9,9 @@ class AmountSection extends StatelessWidget {
   final double amount;
   final bool isIncome;
 
+  static const Color _incomeColor = Color(0xFF10b981);
+  static const Color _expenseColor = Color(0xFFef4444);
+
   const AmountSection({
     super.key,
     required this.amount,
@@ -24,12 +27,12 @@ class AmountSection extends StatelessWidget {
         gradient: LinearGradient(
           colors: isIncome
               ? [
-                  Colors.green.withValues(alpha: 0.1),
-                  Colors.green.withValues(alpha: 0.05)
+                  _incomeColor.withValues(alpha: 0.1),
+                  _incomeColor.withValues(alpha: 0.05)
                 ]
               : [
-                  Colors.red.withValues(alpha: 0.1),
-                  Colors.red.withValues(alpha: 0.05)
+                  _expenseColor.withValues(alpha: 0.1),
+                  _expenseColor.withValues(alpha: 0.05)
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -37,8 +40,8 @@ class AmountSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isIncome
-              ? Colors.green.withValues(alpha: 0.2)
-              : Colors.red.withValues(alpha: 0.2),
+              ? _incomeColor.withValues(alpha: 0.2)
+              : _expenseColor.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -46,7 +49,7 @@ class AmountSection extends StatelessWidget {
           Text(
             isIncome ? AppStrings.common.income : AppStrings.common.expense,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isIncome ? Colors.green : Colors.red,
+                  color: isIncome ? _incomeColor : _expenseColor,
                   fontWeight: FontWeight.w500,
                 ),
           ),
@@ -56,7 +59,7 @@ class AmountSection extends StatelessWidget {
                 .formatAmountWithSign(amount, isIncome: isIncome),
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: isIncome ? Colors.green : Colors.red,
+                  color: isIncome ? _incomeColor : _expenseColor,
                 ),
           ),
         ],

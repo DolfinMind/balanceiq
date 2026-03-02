@@ -25,6 +25,9 @@ class AddTransactionBottomSheet extends StatefulWidget {
 }
 
 class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
+  static const Color _incomeColor = Color(0xFF10b981); // Emerald 500
+  static const Color _expenseColor = Color(0xFFef4444); // Red 500
+
   final _amountController = TextEditingController();
   final _customCategoryController = TextEditingController();
   final _amountFocusNode = FocusNode();
@@ -479,7 +482,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
               context,
               'Expense',
               LucideIcons.arrowUpRight,
-              Colors.red,
+              _expenseColor,
             ),
           ),
           Expanded(
@@ -487,7 +490,7 @@ class _AddTransactionBottomSheetState extends State<AddTransactionBottomSheet> {
               context,
               'Income',
               LucideIcons.arrowDownLeft,
-              Colors.green,
+              _incomeColor,
             ),
           ),
         ],

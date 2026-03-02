@@ -17,6 +17,9 @@ class EditTransactionForm extends StatelessWidget {
   final ValueChanged<String> onCategoryChanged;
   final VoidCallback onDateSelect;
 
+  static const Color _incomeColor = Color(0xFF10b981);
+  static const Color _expenseColor = Color(0xFFef4444);
+
   const EditTransactionForm({
     super.key,
     required this.amountController,
@@ -51,7 +54,7 @@ class EditTransactionForm extends StatelessWidget {
                     'INCOME',
                     'Income',
                     Icons.arrow_downward,
-                    Colors.green,
+                    _incomeColor,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -61,7 +64,7 @@ class EditTransactionForm extends StatelessWidget {
                     'EXPENSE',
                     'Expense',
                     Icons.arrow_upward,
-                    Colors.red,
+                    _expenseColor,
                   ),
                 ),
               ],
@@ -81,7 +84,8 @@ class EditTransactionForm extends StatelessWidget {
               decoration: InputDecoration(
                 prefixText: '${sl<CurrencyCubit>().symbol} ',
                 prefixStyle: TextStyle(
-                  color: selectedType == 'INCOME' ? Colors.green : Colors.red,
+                  color:
+                      selectedType == 'INCOME' ? _incomeColor : _expenseColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
