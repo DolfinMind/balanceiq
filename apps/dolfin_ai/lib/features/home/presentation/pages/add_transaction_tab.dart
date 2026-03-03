@@ -398,7 +398,11 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
               _buildAmountField(context),
               const SizedBox(height: 16),
 
-              // Category Dropdown
+              // Date Picker
+              _buildDatePicker(context),
+              const SizedBox(height: 24),
+
+              // Category Dropdown (now ChoiceChips)
               _buildCategoryDropdown(context),
               const SizedBox(height: 16),
 
@@ -407,10 +411,6 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
                 _buildCustomCategoryField(context),
                 const SizedBox(height: 16),
               ],
-
-              // Date Picker
-              _buildDatePicker(context),
-              const SizedBox(height: 24),
 
               // Submit Button
               _buildSubmitButton(context),
@@ -432,111 +432,102 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
               ),
         ),
         const SizedBox(height: 12),
-        Row(
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
           children: [
-            Expanded(
-              child: _buildTypeButton(
-                context,
-                'Expense',
-                LucideIcons.arrowUpRight,
-                _expenseColor,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildTypeButton(
-                context,
-                'Income',
-                LucideIcons.arrowDownLeft,
-                _incomeColor,
-              ),
-            ),
+            _buildTypePill(context, 'Expense', _expenseColor),
+            _buildTypePill(context, 'Income', _incomeColor),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildTypeButton(
+  Widget _buildTypePill(
     BuildContext context,
     String type,
-    IconData icon,
     Color color,
   ) {
     final isSelected = _transactionType == type;
 
-    return GestureDetector(
-      onTap: _isLoading ? null : () => _onTransactionTypeChanged(type),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
+    return Theme(
+      data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+      child: ChoiceChip(
+        label: Text(type),
+        selected: isSelected,
+        onSelected: _isLoading
+            ? null
+            : (selected) {
+                if (selected) {
+                  _onTransactionTypeChanged(type);
+                }
+              },
+        backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+        selectedColor: color.withValues(alpha: 0.15),
+        labelStyle: TextStyle(
           color: isSelected
-              ? color.withValues(alpha: 0.15)
-              : Theme.of(context).dividerColor.withValues(alpha: 0.05),
+              ? color
+              : Theme.of(context).textTheme.bodyMedium?.color,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+        ),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
+          side: BorderSide(
             color: isSelected
                 ? color.withValues(alpha: 0.3)
                 : Theme.of(context).dividerColor.withValues(alpha: 0.1),
-            width: 1,
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected ? color : Theme.of(context).hintColor,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              type,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? color : Theme.of(context).hintColor,
-                  ),
-            ),
-          ],
-        ),
+        showCheckmark: false,
       ),
     );
   }
 
   Widget _buildAmountField(BuildContext context) {
-    return TextFormField(
-      controller: _amountController,
-      focusNode: _amountFocusNode,
-      enabled: !_isLoading,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-      ],
-      decoration: InputDecoration(
-        labelText: 'Amount',
-        hintText: 'Enter amount',
-        prefixIcon: const Icon(LucideIcons.banknote),
-        suffixText: 'BDT',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Amount',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
-        filled: true,
-        fillColor: Theme.of(context).dividerColor.withValues(alpha: 0.05),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter an amount';
-        }
-        final amount = double.tryParse(value);
-        if (amount == null || amount <= 0) {
-          return 'Please enter a valid amount';
-        }
-        return null;
-      },
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _amountController,
+          focusNode: _amountFocusNode,
+          enabled: !_isLoading,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+          ],
+          decoration: InputDecoration(
+            hintText: 'Enter amount',
+            prefixIcon: const Icon(LucideIcons.banknote),
+            suffixText: 'BDT',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            filled: true,
+            fillColor: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter an amount';
+            }
+            final amount = double.tryParse(value);
+            if (amount == null || amount <= 0) {
+              return 'Please enter a valid amount';
+            }
+            return null;
+          },
+        ),
+      ],
     );
   }
 
@@ -621,36 +612,54 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
   }
 
   Widget _buildDatePicker(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Date of transaction',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  surface: Colors.transparent, // Match parent container
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+            border: Border.all(
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              height: 260,
+              child: Transform.scale(
+                scale: 0.85,
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: Theme.of(context).colorScheme.copyWith(
+                          surface: Colors.transparent, // Match parent container
+                        ),
+                  ),
+                  child: CalendarDatePicker(
+                    initialDate: _selectedDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime.now().add(const Duration(days: 1)),
+                    onDateChanged: _isLoading
+                        ? (date) {}
+                        : (date) {
+                            setState(() {
+                              _selectedDate = date;
+                            });
+                          },
+                  ),
                 ),
-          ),
-          child: CalendarDatePicker(
-            initialDate: _selectedDate,
-            firstDate: DateTime(2020),
-            lastDate: DateTime.now().add(const Duration(days: 1)),
-            onDateChanged: _isLoading
-                ? (date) {}
-                : (date) {
-                    setState(() {
-                      _selectedDate = date;
-                    });
-                  },
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
