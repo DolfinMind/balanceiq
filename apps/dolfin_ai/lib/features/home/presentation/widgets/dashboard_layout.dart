@@ -151,18 +151,16 @@ class DashboardLayout extends StatelessWidget {
           right: 24,
           bottom: 28,
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Hero(
-                  tag: 'bottom_nav',
-                  child: FloatingBottomNav(
-                    onDashboardRefresh: onChatReturn,
-                    onTabChanged: onTabChanged,
-                    selectedTab: selectedTab,
-                  ),
+              Hero(
+                tag: 'bottom_nav',
+                child: FloatingBottomNav(
+                  onDashboardRefresh: onChatReturn,
+                  onTabChanged: onTabChanged,
+                  selectedTab: selectedTab,
                 ),
               ),
-              const SizedBox(width: 16),
               ChatFabWidget(
                 isDark: Theme.of(context).brightness == Brightness.dark,
                 onReturn: onChatReturn,

@@ -383,17 +383,16 @@ class _DashboardViewState extends State<DashboardView> {
                                   right: 24,
                                   bottom: 28,
                                   child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(
-                                        child: FloatingBottomNav(
-                                          onDashboardRefresh: _loadDashboard,
-                                          onTabChanged: (index) {
-                                            setState(() => _currentTab = index);
-                                          },
-                                          selectedTab: _currentTab,
-                                        ),
+                                      FloatingBottomNav(
+                                        onDashboardRefresh: _loadDashboard,
+                                        onTabChanged: (index) {
+                                          setState(() => _currentTab = index);
+                                        },
+                                        selectedTab: _currentTab,
                                       ),
-                                      const SizedBox(width: 16),
                                       ChatFabWidget(
                                         isDark: Theme.of(context).brightness ==
                                             Brightness.dark,
