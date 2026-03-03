@@ -115,6 +115,29 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
     super.dispose();
   }
 
+  void _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now().add(const Duration(days: 1)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme,
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
   void _onCategoryChanged(String? value) {
     setState(() {
       if (value == 'Custom') {
@@ -362,8 +385,7 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
     return Container(
       color: Theme.of(context).colorScheme.surface,
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 24, // Top safe area + padding
-        bottom: 120, // Space for the bottom nav bar
+        top: MediaQuery.of(context).padding.top, // Top safe area + padding
         left: 20,
         right: 20,
       ),
@@ -382,11 +404,11 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
                     ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
               // Transaction Type Toggle
               _buildTransactionTypeToggle(context),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Amount Field
               _buildAmountField(context),
@@ -394,7 +416,7 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
 
               // Date Picker
               _buildDatePicker(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
               // Category Dropdown (now ChoiceChips)
               _buildCategoryDropdown(context),
@@ -408,6 +430,7 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
 
               // Submit Button
               _buildSubmitButton(context),
+              SizedBox(height: 100)
             ],
           ),
         ),
@@ -616,40 +639,38 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
               ),
         ),
         const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
-            border: Border.all(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+        InkWell(
+          onTap: _isLoading ? null : _selectDate,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+              ),
+              borderRadius: BorderRadius.circular(16),
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
             ),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              height: 260,
-              child: Transform.scale(
-                scale: 0.85,
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: Theme.of(context).colorScheme.copyWith(
-                          surface: Colors.transparent, // Match parent container
+            child: Row(
+              children: [
+                Icon(
+                  LucideIcons.calendar,
+                  color: Theme.of(context).hintColor,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                   ),
-                  child: CalendarDatePicker(
-                    initialDate: _selectedDate,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now().add(const Duration(days: 1)),
-                    onDateChanged: _isLoading
-                        ? (date) {}
-                        : (date) {
-                            setState(() {
-                              _selectedDate = date;
-                            });
-                          },
-                  ),
                 ),
-              ),
+                Icon(
+                  LucideIcons.chevronRight,
+                  color: Theme.of(context).hintColor,
+                ),
+              ],
             ),
           ),
         ),

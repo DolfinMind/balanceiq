@@ -6,10 +6,8 @@ import 'analysis_widgets/spending_donut_chart.dart';
 import 'analysis_widgets/category_breakdown_widget.dart';
 import 'dashboard_widgets/balance_card_widget.dart';
 import 'dashboard_widgets/highlights_insight_card.dart';
-import 'dashboard_widgets/floating_chat_button.dart';
 import 'dashboard_widgets/home_appbar.dart';
 import 'dashboard_widgets/transaction_history_widget.dart';
-import 'dashboard_widgets/chat_fab_widget.dart';
 
 class DashboardLayout extends StatelessWidget {
   final DashboardSummary summary;
@@ -141,31 +139,6 @@ class DashboardLayout extends StatelessWidget {
                         summary.biggestExpenseDescription,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        // Positioned bottom nav and chat FAB aligned together in the center
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 28,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Hero(
-                tag: 'bottom_nav',
-                child: FloatingBottomNav(
-                  onDashboardRefresh: onChatReturn,
-                  onTabChanged: onTabChanged,
-                  selectedTab: selectedTab,
-                ),
-              ),
-              const SizedBox(width: 16),
-              ChatFabWidget(
-                isDark: Theme.of(context).brightness == Brightness.dark,
-                onReturn: onChatReturn,
               ),
             ],
           ),
