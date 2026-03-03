@@ -122,12 +122,16 @@ class BalanceCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          amount,
-          style: textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
-            color: colorScheme.onSurface,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            amount,
+            style: textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w900,
+              fontSize: 24, // Fix font size to prevent shrinking across modes
+              letterSpacing: -0.5,
+              color: colorScheme.onSurface,
+            ),
           ),
         ),
       ],
