@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:feature_chat/presentation/pages/chat_page.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ChatFabWidget extends StatelessWidget {
   final VoidCallback? onReturn;
@@ -58,10 +57,11 @@ class ChatFabWidget extends StatelessWidget {
                 ],
               ),
               child: Center(
-                child: Icon(
-                  LucideIcons.messageCircle,
-                  color: Colors.white,
-                  size: 24,
+                child: Image.asset(
+                  'assets/icons/app_icon.png',
+                  width: 24,
+                  height: 24,
+                  color: isDark ? Colors.white : null,
                 ),
               ),
             ),
