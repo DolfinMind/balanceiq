@@ -3,8 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import 'add_transaction_bottom_sheet.dart';
-
 /// Modern frosted glass floating bottom navigation bar.
 /// Three icon-only items: Home (0), Analysis (1), Add (2).
 /// Home and Analysis work as tabs via [onTabChanged].
@@ -47,22 +45,6 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     if (_visualIndex == index) return;
     setState(() => _visualIndex = index);
     widget.onTabChanged?.call(index);
-  }
-
-  void _showAddTransactionSheet() {
-    setState(() => _visualIndex = 2);
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => AddTransactionBottomSheet(
-        onSuccess: () {
-          widget.onDashboardRefresh?.call();
-        },
-      ),
-    ).whenComplete(() {
-      if (mounted) setState(() => _visualIndex = widget.selectedTab);
-    });
   }
 
   @override
@@ -120,7 +102,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                 icon: LucideIcons.plus,
                 colorScheme: colorScheme,
                 isDark: isDark,
-                onTap: _showAddTransactionSheet,
+                onTap: () => _onTapTab(2),
               ),
             ],
           ),
@@ -149,7 +131,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           color: isSelected
               ? colorScheme.primary.withValues(alpha: 0.15)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Icon(
           icon,

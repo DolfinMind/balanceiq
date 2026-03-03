@@ -20,6 +20,7 @@ import '../widgets/dashboard_widgets/chat_fab_widget.dart';
 import 'error_page.dart';
 import 'graphs_page.dart';
 import '../widgets/calendar_widgets/custom_calendar_date_range_picker.dart';
+import 'add_transaction_tab.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -47,7 +48,7 @@ class _DashboardViewState extends State<DashboardView> {
   DateTime? _endDate;
   bool _tourCheckDone = false;
   String? _selectedDateLabel = 'Last 30 Days'; // Initialize with default label
-  int _currentTab = 0; // 0 = Home, 1 = Analysis
+  int _currentTab = 0; // 0 = Home, 1 = Analysis, 2 = Add Transaction
 
   final GlobalKey _profileIconKey = GlobalKey();
   late DashboardTourController _tourController;
@@ -339,12 +340,13 @@ class _DashboardViewState extends State<DashboardView> {
                   if (state is DashboardLoaded) {
                     final summary = state.summary;
 
-                    return AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      switchInCurve: Curves.easeInOut,
-                      switchOutCurve: Curves.easeInOut,
-                      child: _currentTab == 0
-                          ? DashboardLayout(
+                    return Stack(
+                      children: [
+                        IndexedStack(
+                          index: _currentTab,
+                          children: [
+                            // Tab 0: Home
+                            DashboardLayout(
                               key: const ValueKey('home'),
                               summary: summary,
                               onRefresh: _refreshDashboard,
@@ -368,42 +370,49 @@ class _DashboardViewState extends State<DashboardView> {
                               displayDate: _getFormattedDateRange(),
                               onTapDateRange: _selectDateRange,
                               profileIconKey: _profileIconKey,
-                            )
-                          : Stack(
-                              key: const ValueKey('analysis'),
-                              children: [
-                                GraphsPage(
-                                  summary: summary,
-                                  displayDate: _getFormattedDateRange(),
-                                  onTapDateRange: _selectDateRange,
-                                ),
-                                // Positioned bottom nav and chat FAB aligned together in the center
-                                Positioned(
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 28,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      FloatingBottomNav(
-                                        onDashboardRefresh: _loadDashboard,
-                                        onTabChanged: (index) {
-                                          setState(() => _currentTab = index);
-                                        },
-                                        selectedTab: _currentTab,
-                                      ),
-                                      const SizedBox(width: 16),
-                                      ChatFabWidget(
-                                        isDark: Theme.of(context).brightness ==
-                                            Brightness.dark,
-                                        onReturn: _loadDashboard,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
                             ),
+                            // Tab 1: Analysis
+                            GraphsPage(
+                              key: const ValueKey('analysis'),
+                              summary: summary,
+                              displayDate: _getFormattedDateRange(),
+                              onTapDateRange: _selectDateRange,
+                            ),
+                            // Tab 2: Add Transaction
+                            AddTransactionTab(
+                              onSuccess: () {
+                                _loadDashboard();
+                                setState(() => _currentTab = 0);
+                              },
+                            ),
+                          ],
+                        ),
+                        // Positioned bottom nav and chat FAB aligned together in the center
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 28,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              FloatingBottomNav(
+                                onDashboardRefresh: _loadDashboard,
+                                onTabChanged: (index) {
+                                  setState(() => _currentTab = index);
+                                },
+                                selectedTab: _currentTab,
+                              ),
+                              const SizedBox(width: 16),
+                              ChatFabWidget(
+                                isDark: Theme.of(context).brightness ==
+                                    Brightness.dark,
+                                onReturn: _loadDashboard,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     );
                   }
 
