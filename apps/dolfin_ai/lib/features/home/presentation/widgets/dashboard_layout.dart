@@ -145,13 +145,14 @@ class DashboardLayout extends StatelessWidget {
             ],
           ),
         ),
-        // Positioned bottom nav and chat FAB aligned together
+        // Positioned bottom nav and chat FAB aligned together in the center
         Positioned(
-          left: 24,
-          right: 24,
+          left: 0,
+          right: 0,
           bottom: 28,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Hero(
                 tag: 'bottom_nav',
@@ -161,6 +162,7 @@ class DashboardLayout extends StatelessWidget {
                   selectedTab: selectedTab,
                 ),
               ),
+              const SizedBox(width: 16),
               ChatFabWidget(
                 isDark: Theme.of(context).brightness == Brightness.dark,
                 onReturn: onChatReturn,

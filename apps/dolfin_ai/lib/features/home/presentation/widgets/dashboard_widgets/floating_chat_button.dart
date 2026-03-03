@@ -106,7 +106,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                 isDark: isDark,
                 onTap: () => _onTapTab(0),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 16),
               _navIcon(
                 index: 1,
                 icon: LucideIcons.chartLine,
@@ -114,7 +114,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                 isDark: isDark,
                 onTap: () => _onTapTab(1),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 16),
               _navIcon(
                 index: 2,
                 icon: LucideIcons.plus,

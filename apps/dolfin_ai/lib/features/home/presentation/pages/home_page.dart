@@ -377,14 +377,14 @@ class _DashboardViewState extends State<DashboardView> {
                                   displayDate: _getFormattedDateRange(),
                                   onTapDateRange: _selectDateRange,
                                 ),
-                                // Positioned bottom nav and chat FAB aligned together
+                                // Positioned bottom nav and chat FAB aligned together in the center
                                 Positioned(
-                                  left: 24,
-                                  right: 24,
+                                  left: 0,
+                                  right: 0,
                                   bottom: 28,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       FloatingBottomNav(
                                         onDashboardRefresh: _loadDashboard,
@@ -393,6 +393,7 @@ class _DashboardViewState extends State<DashboardView> {
                                         },
                                         selectedTab: _currentTab,
                                       ),
+                                      const SizedBox(width: 16),
                                       ChatFabWidget(
                                         isDark: Theme.of(context).brightness ==
                                             Brightness.dark,
