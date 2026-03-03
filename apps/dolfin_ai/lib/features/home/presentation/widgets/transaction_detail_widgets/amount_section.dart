@@ -22,42 +22,27 @@ class AmountSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isIncome
-              ? [
-                  _incomeColor.withValues(alpha: 0.1),
-                  _incomeColor.withValues(alpha: 0.05)
-                ]
-              : [
-                  _expenseColor.withValues(alpha: 0.1),
-                  _expenseColor.withValues(alpha: 0.05)
-                ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isIncome
-              ? _incomeColor.withValues(alpha: 0.2)
-              : _expenseColor.withValues(alpha: 0.2),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
         ),
       ),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             isIncome ? AppStrings.common.income : AppStrings.common.expense,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isIncome ? _incomeColor : _expenseColor,
-                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).hintColor,
                 ),
           ),
-          const SizedBox(height: 8),
           Text(
             sl<CurrencyCubit>()
                 .formatAmountWithSign(amount, isIncome: isIncome),
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: isIncome ? _incomeColor : _expenseColor,
                 ),

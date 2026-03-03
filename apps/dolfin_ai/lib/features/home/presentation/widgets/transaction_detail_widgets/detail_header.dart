@@ -49,7 +49,7 @@ class DetailHeader extends StatelessWidget {
               children: [
                 Text(
                   isEditMode ? 'Edit Transaction' : 'Transaction Details',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
@@ -66,7 +66,10 @@ class DetailHeader extends StatelessWidget {
                 .fadeIn(delay: 100.ms, duration: 300.ms)
                 .slideX(begin: 0.1, end: 0, delay: 100.ms, duration: 300.ms),
           ),
-          // Removed redundant IconButton
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.pop(context),
+          ),
         ],
       ),
     );
