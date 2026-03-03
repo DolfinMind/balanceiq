@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
-
 import '../../domain/entities/dashbaord_summary.dart';
 import 'analysis_widgets/spending_donut_chart.dart';
 import 'analysis_widgets/category_breakdown_widget.dart';
@@ -43,14 +41,14 @@ class DashboardLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        LiquidPullToRefresh(
+        RefreshIndicator(
           onRefresh: onRefresh,
           color: Theme.of(context).colorScheme.primary,
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          showChildOpacityTransition: false,
-          springAnimationDurationInMilliseconds: 500,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             slivers: [
               // --- Animated AppBar ---
               HomeAppbar(
