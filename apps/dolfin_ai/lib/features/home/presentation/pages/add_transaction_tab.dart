@@ -205,9 +205,13 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
           }
         },
         (response) {
-          Navigator.pop(context);
-          SnackbarUtils.showSuccess(context, 'Transaction added successfully!');
-          widget.onSuccess();
+          setState(() {
+            _isLoading = false;
+            // Clear inputs for the next time
+            _amountController.clear();
+            _customCategoryController.clear();
+          });
+          _showSuccessModal();
         },
       );
     } catch (e) {
@@ -217,6 +221,48 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
       });
       SnackbarUtils.showError(context, 'Error: ${e.toString()}');
     }
+  }
+
+  void _showSuccessModal() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          icon: Icon(
+            LucideIcons.circleCheck,
+            size: 48,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          title: const Text('Success!'),
+          content: const Text(
+            'Your transaction has been added successfully.',
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  widget.onSuccess(); // Go back to dashboard
+                },
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: const Text('Back to Dashboard'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _handleChatError(ChatFailureType type, String message) {
