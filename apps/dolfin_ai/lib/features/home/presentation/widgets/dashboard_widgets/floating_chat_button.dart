@@ -70,60 +70,57 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 36, vertical: 28),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-          child: Container(
-            height: 56,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
+          height: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.white.withValues(alpha: 0.65),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.white.withValues(alpha: 0.65),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.15)
-                    : Colors.black.withValues(alpha: 0.06),
-                width: 0.5,
+                  ? Colors.white.withValues(alpha: 0.15)
+                  : Colors.black.withValues(alpha: 0.06),
+              width: 0.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _navIcon(
-                  index: 0,
-                  icon: LucideIcons.house,
-                  colorScheme: colorScheme,
-                  isDark: isDark,
-                  onTap: () => _onTapTab(0),
-                ),
-                _navIcon(
-                  index: 1,
-                  icon: LucideIcons.chartLine,
-                  colorScheme: colorScheme,
-                  isDark: isDark,
-                  onTap: () => _onTapTab(1),
-                ),
-                _navIcon(
-                  index: 2,
-                  icon: LucideIcons.plus,
-                  colorScheme: colorScheme,
-                  isDark: isDark,
-                  onTap: _showAddTransactionSheet,
-                ),
-              ],
-            ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _navIcon(
+                index: 0,
+                icon: LucideIcons.house,
+                colorScheme: colorScheme,
+                isDark: isDark,
+                onTap: () => _onTapTab(0),
+              ),
+              _navIcon(
+                index: 1,
+                icon: LucideIcons.chartLine,
+                colorScheme: colorScheme,
+                isDark: isDark,
+                onTap: () => _onTapTab(1),
+              ),
+              _navIcon(
+                index: 2,
+                icon: LucideIcons.plus,
+                colorScheme: colorScheme,
+                isDark: isDark,
+                onTap: _showAddTransactionSheet,
+              ),
+            ],
           ),
         ),
       ),

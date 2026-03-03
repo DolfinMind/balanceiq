@@ -377,25 +377,29 @@ class _DashboardViewState extends State<DashboardView> {
                                   displayDate: _getFormattedDateRange(),
                                   onTapDateRange: _selectDateRange,
                                 ),
+                                // Positioned bottom nav and chat FAB aligned together
                                 Positioned(
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 0,
-                                  child: FloatingBottomNav(
-                                    onDashboardRefresh: _loadDashboard,
-                                    onTabChanged: (index) {
-                                      setState(() => _currentTab = index);
-                                    },
-                                    selectedTab: _currentTab,
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 0,
-                                  bottom: 0,
-                                  child: ChatFabWidget(
-                                    isDark: Theme.of(context).brightness ==
-                                        Brightness.dark,
-                                    onReturn: _loadDashboard,
+                                  left: 24,
+                                  right: 24,
+                                  bottom: 28,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: FloatingBottomNav(
+                                          onDashboardRefresh: _loadDashboard,
+                                          onTabChanged: (index) {
+                                            setState(() => _currentTab = index);
+                                          },
+                                          selectedTab: _currentTab,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      ChatFabWidget(
+                                        isDark: Theme.of(context).brightness ==
+                                            Brightness.dark,
+                                        onReturn: _loadDashboard,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
