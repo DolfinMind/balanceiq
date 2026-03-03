@@ -9,6 +9,7 @@ import 'dashboard_widgets/highlights_insight_card.dart';
 import 'dashboard_widgets/floating_chat_button.dart';
 import 'dashboard_widgets/home_appbar.dart';
 import 'dashboard_widgets/transaction_history_widget.dart';
+import 'dashboard_widgets/chat_fab_widget.dart';
 
 class DashboardLayout extends StatelessWidget {
   final DashboardSummary summary;
@@ -156,6 +157,15 @@ class DashboardLayout extends StatelessWidget {
               onTabChanged: onTabChanged,
               selectedTab: selectedTab,
             ),
+          ),
+        ),
+        // Positioned Chat FAB
+        Positioned(
+          right: 0, // padding is handled inside ChatFabWidget
+          bottom: 0,
+          child: ChatFabWidget(
+            isDark: Theme.of(context).brightness == Brightness.dark,
+            onReturn: onChatReturn,
           ),
         ),
       ],

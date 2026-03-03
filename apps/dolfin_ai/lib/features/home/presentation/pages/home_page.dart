@@ -16,6 +16,7 @@ import '../cubit/transactions_cubit.dart';
 import '../widgets/calendar_widgets/date_selector_bottom_sheet.dart';
 import '../widgets/dashboard_layout.dart';
 import '../widgets/dashboard_widgets/floating_chat_button.dart';
+import '../widgets/dashboard_widgets/chat_fab_widget.dart';
 import 'error_page.dart';
 import 'graphs_page.dart';
 import '../widgets/calendar_widgets/custom_calendar_date_range_picker.dart';
@@ -386,6 +387,15 @@ class _DashboardViewState extends State<DashboardView> {
                                       setState(() => _currentTab = index);
                                     },
                                     selectedTab: _currentTab,
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  bottom: 0,
+                                  child: ChatFabWidget(
+                                    isDark: Theme.of(context).brightness ==
+                                        Brightness.dark,
+                                    onReturn: _loadDashboard,
                                   ),
                                 ),
                               ],

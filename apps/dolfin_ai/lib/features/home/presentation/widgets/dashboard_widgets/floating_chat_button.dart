@@ -1,15 +1,14 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:feature_chat/presentation/pages/chat_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'add_transaction_bottom_sheet.dart';
 
 /// Modern frosted glass floating bottom navigation bar.
-/// Four icon-only items: Home (0), Analysis (1), Chat (2), Add (3).
+/// Three icon-only items: Home (0), Analysis (1), Add (2).
 /// Home and Analysis work as tabs via [onTabChanged].
-/// Chat and Add open modals and return to the previous tab.
+/// Add opens a modal and returns to the previous tab.
 class FloatingBottomNav extends StatefulWidget {
   final VoidCallback? onDashboardRefresh;
   final ValueChanged<int>? onTabChanged;
@@ -50,23 +49,8 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     widget.onTabChanged?.call(index);
   }
 
-  void _navigateToChat() async {
-    setState(() => _visualIndex = 2);
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChatPage(
-          botId: "nai kichu",
-          botName: 'Donfin AI',
-        ),
-      ),
-    );
-    if (mounted) setState(() => _visualIndex = widget.selectedTab);
-    widget.onDashboardRefresh?.call();
-  }
-
   void _showAddTransactionSheet() {
-    setState(() => _visualIndex = 3);
+    setState(() => _visualIndex = 2);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -133,13 +117,6 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                 ),
                 _navIcon(
                   index: 2,
-                  icon: LucideIcons.messageCircle,
-                  colorScheme: colorScheme,
-                  isDark: isDark,
-                  onTap: _navigateToChat,
-                ),
-                _navIcon(
-                  index: 3,
                   icon: LucideIcons.plus,
                   colorScheme: colorScheme,
                   isDark: isDark,
