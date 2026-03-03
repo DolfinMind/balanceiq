@@ -43,12 +43,6 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
   void initState() {
     super.initState();
     _checkMessageUsage();
-    // Auto-focus amount field when sheet opens
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_isLimitReached) {
-        _amountFocusNode.requestFocus();
-      }
-    });
   }
 
   bool get _isLimitReached => _messageUsage?.isLimitReached ?? false;
