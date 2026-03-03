@@ -40,9 +40,9 @@ class TransactionHistoryWidget extends StatelessWidget {
             children: [
               Text(
                 GetIt.I<DashboardStrings>().recentTransactions,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
                     ),
               ),
               TextButton(

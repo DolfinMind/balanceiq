@@ -50,10 +50,19 @@ class SpendingDonutChart extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            'Spending Overview',
+            style: textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 16),
           SizedBox(
             height: 260,
-            width: 260,
+            width: double.infinity,
             child: Stack(
               alignment: Alignment.center,
               children: [
