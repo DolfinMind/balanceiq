@@ -59,7 +59,7 @@ class ChatFabWidget extends StatelessWidget {
               ),
               child: Center(
                 child: Icon(
-                  LucideIcons.bot,
+                  LucideIcons.messageCircle,
                   color: Colors.white,
                   size: 24,
                 ),
