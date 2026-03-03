@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:dolfin_core/error/failures.dart';
 import 'package:dolfin_core/utils/snackbar_utils.dart';
 import 'package:feature_chat/domain/entities/message_usage.dart';
@@ -24,8 +23,8 @@ class AddTransactionTab extends StatefulWidget {
 }
 
 class _AddTransactionTabState extends State<AddTransactionTab> {
-  static const Color _incomeColor = Color(0xFF10b981); // Emerald 500
-  static const Color _expenseColor = Color(0xFFef4444); // Red 500
+  static const Color _incomeColor = Color(0xFF34d399); // Soft Emerald
+  static const Color _expenseColor = Color(0xFFf87171); // Soft Red
 
   final _amountController = TextEditingController();
   final _customCategoryController = TextEditingController();
@@ -120,29 +119,6 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
     _customCategoryController.dispose();
     _amountFocusNode.dispose();
     super.dispose();
-  }
-
-  void _selectDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now().add(const Duration(days: 1)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme,
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
   }
 
   void _onCategoryChanged(String? value) {
@@ -407,9 +383,8 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
               // Title
               Text(
                 'Add Transaction',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -525,6 +500,9 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
       focusNode: _amountFocusNode,
       enabled: !_isLoading,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
       ],
@@ -604,49 +582,34 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
   }
 
   Widget _buildDatePicker(BuildContext context) {
-    return InkWell(
-      onTap: _isLoading ? null : _selectDate,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
-          ),
-          borderRadius: BorderRadius.circular(16),
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
         ),
-        child: Row(
-          children: [
-            Icon(
-              LucideIcons.calendar,
-              color: Theme.of(context).hintColor,
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Date',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).hintColor,
-                      ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  surface: Colors.transparent, // Match parent container
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              ],
-            ),
-            const Spacer(),
-            Icon(
-              LucideIcons.chevronRight,
-              color: Theme.of(context).hintColor,
-            ),
-          ],
+          ),
+          child: CalendarDatePicker(
+            initialDate: _selectedDate,
+            firstDate: DateTime(2020),
+            lastDate: DateTime.now().add(const Duration(days: 1)),
+            onDateChanged: _isLoading
+                ? (date) {}
+                : (date) {
+                    setState(() {
+                      _selectedDate = date;
+                    });
+                  },
+          ),
         ),
       ),
     );
