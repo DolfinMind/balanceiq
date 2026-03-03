@@ -201,7 +201,7 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
           if (failure is ChatApiFailure) {
             _handleChatError(failure.failureType, failure.message);
           } else {
-            SnackbarUtils.showError(context, failure.message);
+            _showFailureModal(failure.message);
           }
         },
         (response) {
@@ -219,7 +219,7 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
       setState(() {
         _isLoading = false;
       });
-      SnackbarUtils.showError(context, 'Error: ${e.toString()}');
+      _showFailureModal('Error: ${e.toString()}');
     }
   }
 
@@ -243,20 +243,78 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
             textAlign: TextAlign.center,
           ),
           actions: [
+            Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the dialog
+                      widget.onSuccess(); // Go back to dashboard
+                    },
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text('Back to Dashboard'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the dialog
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text('Add Another Transaction'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFailureModal(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          icon: Icon(
+            LucideIcons.circleAlert,
+            size: 48,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          title: const Text('Transaction Failed'),
+          content: Text(
+            errorMessage,
+            textAlign: TextAlign.center,
+          ),
+          actions: [
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the dialog
-                  widget.onSuccess(); // Go back to dashboard
-                },
+                onPressed: () => Navigator.pop(context),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const Text('Back to Dashboard'),
+                child: const Text('Try Again'),
               ),
             ),
           ],
