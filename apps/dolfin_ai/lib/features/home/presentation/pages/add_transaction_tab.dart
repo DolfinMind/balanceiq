@@ -383,8 +383,8 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
               // Title
               Text(
                 'Add Transaction',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -422,32 +422,38 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
   }
 
   Widget _buildTransactionTypeToggle(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildTypeButton(
-              context,
-              'Expense',
-              LucideIcons.arrowUpRight,
-              _expenseColor,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Transaction Type',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildTypeButton(
+                context,
+                'Expense',
+                LucideIcons.arrowUpRight,
+                _expenseColor,
+              ),
             ),
-          ),
-          Expanded(
-            child: _buildTypeButton(
-              context,
-              'Income',
-              LucideIcons.arrowDownLeft,
-              _incomeColor,
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildTypeButton(
+                context,
+                'Income',
+                LucideIcons.arrowDownLeft,
+                _incomeColor,
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -465,12 +471,16 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color:
-              isSelected ? color.withValues(alpha: 0.15) : Colors.transparent,
+          color: isSelected
+              ? color.withValues(alpha: 0.15)
+              : Theme.of(context).dividerColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(color: color.withValues(alpha: 0.3), width: 1)
-              : null,
+          border: Border.all(
+            color: isSelected
+                ? color.withValues(alpha: 0.3)
+                : Theme.of(context).dividerColor.withValues(alpha: 0.1),
+            width: 1,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -531,30 +541,59 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
   }
 
   Widget _buildCategoryDropdown(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      value: _isCustomCategory ? 'Custom' : _selectedCategory,
-      decoration: InputDecoration(
-        labelText: 'Category',
-        prefixIcon: const Icon(LucideIcons.tag),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Category',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
-        filled: true,
-        fillColor: Theme.of(context).dividerColor.withValues(alpha: 0.05),
-      ),
-      items: _categories.map((category) {
-        return DropdownMenuItem(
-          value: category,
-          child: Text(category),
-        );
-      }).toList(),
-      onChanged: _isLoading ? null : _onCategoryChanged,
-      validator: (value) {
-        if (value == null && !_isCustomCategory) {
-          return 'Please select a category';
-        }
-        return null;
-      },
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _categories.map((category) {
+            final isSelected = (_isCustomCategory && category == 'Custom') ||
+                (!_isCustomCategory && _selectedCategory == category);
+            return Theme(
+              data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+              child: ChoiceChip(
+                label: Text(category),
+                selected: isSelected,
+                onSelected: _isLoading
+                    ? null
+                    : (selected) {
+                        if (selected) {
+                          _onCategoryChanged(category);
+                        }
+                      },
+                backgroundColor:
+                    Theme.of(context).dividerColor.withValues(alpha: 0.05),
+                selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                labelStyle: TextStyle(
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.onPrimaryContainer
+                      : Theme.of(context).textTheme.bodyMedium?.color,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(
+                    color: isSelected
+                        ? Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.3)
+                        : Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                  ),
+                ),
+                showCheckmark: false,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
