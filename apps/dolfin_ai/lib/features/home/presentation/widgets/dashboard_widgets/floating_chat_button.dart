@@ -62,12 +62,12 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           decoration: BoxDecoration(
             color: isDark
                 ? Colors.white.withValues(alpha: 0.08)
-                : Colors.white.withValues(alpha: 0.65),
+                : Colors.black.withValues(alpha: 0.75), // Darker in light mode
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: isDark
                   ? Colors.white.withValues(alpha: 0.15)
-                  : Colors.black.withValues(alpha: 0.06),
+                  : Colors.white.withValues(alpha: 0.1),
               width: 0.5,
             ),
             boxShadow: [
@@ -138,9 +138,9 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           size: 20, // Slightly smaller icon
           color: isSelected
               ? colorScheme.primary
-              : isDark
-                  ? Colors.white.withValues(alpha: 0.55)
-                  : colorScheme.onSurface.withValues(alpha: 0.45),
+              : Colors.white.withValues(
+                  alpha:
+                      0.55), // Always white-ish since background is dark in both modes
         ),
       ),
     );

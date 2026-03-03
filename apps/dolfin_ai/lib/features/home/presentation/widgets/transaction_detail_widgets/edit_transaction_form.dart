@@ -17,8 +17,8 @@ class EditTransactionForm extends StatelessWidget {
   final ValueChanged<String> onCategoryChanged;
   final VoidCallback onDateSelect;
 
-  static const Color _incomeColor = Color(0xFF10b981);
-  static const Color _expenseColor = Color(0xFFef4444);
+  static const Color _incomeColor = Color(0xFF34d399); // Soft Emerald
+  static const Color _expenseColor = Color(0xFFf87171); // Soft Red
 
   const EditTransactionForm({
     super.key,
@@ -35,8 +35,6 @@ class EditTransactionForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -46,32 +44,17 @@ class EditTransactionForm extends StatelessWidget {
           _buildFormSection(
             context,
             label: AppStrings.transactions.transactionType,
-            child: Row(
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                Expanded(
-                  child: _buildTypeChip(
-                    context,
-                    'INCOME',
-                    'Income',
-                    Icons.arrow_downward,
-                    _incomeColor,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildTypeChip(
-                    context,
-                    'EXPENSE',
-                    'Expense',
-                    Icons.arrow_upward,
-                    _expenseColor,
-                  ),
-                ),
+                _buildTypePill(context, 'Expense', _expenseColor),
+                _buildTypePill(context, 'Income', _incomeColor),
               ],
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Amount
           _buildFormSection(
@@ -81,33 +64,121 @@ class EditTransactionForm extends StatelessWidget {
               controller: amountController,
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
               decoration: InputDecoration(
-                prefixText: '${sl<CurrencyCubit>().symbol} ',
-                prefixStyle: TextStyle(
-                  color:
-                      selectedType == 'INCOME' ? _incomeColor : _expenseColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                hintText: 'Enter amount',
+                prefixIcon: const Icon(Icons
+                    .money), // Using standard icon if Lucide not heavily imported
+                suffixText: sl<CurrencyCubit>().symbol,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 filled: true,
-                fillColor: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              ),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fillColor:
+                    Theme.of(context).dividerColor.withValues(alpha: 0.05),
               ),
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+
+          // Date
+          _buildFormSection(
+            context,
+            label: AppStrings.transactions.date,
+            child: InkWell(
+              onTap: onDateSelect,
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color:
+                        Theme.of(context).dividerColor.withValues(alpha: 0.3),
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      color: Theme.of(context).hintColor,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        DateFormat('EEEE, MMMM d, yyyy').format(selectedDate),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Theme.of(context).hintColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Category
+          _buildFormSection(
+            context,
+            label: AppStrings.transactions.category,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: categories.map((category) {
+                final isSelected = selectedCategory == category;
+                return Theme(
+                  data: Theme.of(context)
+                      .copyWith(canvasColor: Colors.transparent),
+                  child: ChoiceChip(
+                    label: Text(category),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) {
+                        onCategoryChanged(category);
+                      }
+                    },
+                    backgroundColor:
+                        Theme.of(context).dividerColor.withValues(alpha: 0.05),
+                    selectedColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    labelStyle: TextStyle(
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: isSelected
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.3)
+                            : Theme.of(context)
+                                .dividerColor
+                                .withValues(alpha: 0.1),
+                      ),
+                    ),
+                    showCheckmark: false,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+
+          const SizedBox(height: 16),
 
           // Description
           _buildFormSection(
@@ -118,90 +189,12 @@ class EditTransactionForm extends StatelessWidget {
               maxLines: 2,
               decoration: InputDecoration(
                 hintText: AppStrings.transactions.descriptionHint,
-                filled: true,
-                fillColor: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.grey[100],
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                contentPadding: const EdgeInsets.all(16),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Category
-          _buildFormSection(
-            context,
-            label: AppStrings.transactions.category,
-            child: DropdownButtonFormField<String>(
-              value: categories.contains(selectedCategory)
-                  ? selectedCategory
-                  : categories.last,
-              decoration: InputDecoration(
                 filled: true,
-                fillColor: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              items: categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  onCategoryChanged(value);
-                }
-              },
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Date
-          _buildFormSection(
-            context,
-            label: AppStrings.transactions.date,
-            child: InkWell(
-              onTap: onDateSelect,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      DateFormat('EEEE, MMMM d, yyyy').format(selectedDate),
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const Spacer(),
-                    Icon(
-                      Icons.chevron_right,
-                      color: Theme.of(context).hintColor,
-                    ),
-                  ],
-                ),
+                fillColor:
+                    Theme.of(context).dividerColor.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -222,55 +215,52 @@ class EditTransactionForm extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
               ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         child,
       ],
     );
   }
 
-  Widget _buildTypeChip(BuildContext context, String type, String label,
-      IconData icon, Color color) {
-    final isSelected = selectedType == type;
+  Widget _buildTypePill(
+    BuildContext context,
+    String type,
+    Color color,
+  ) {
+    // Treat 'Income' matching 'INCOME' if necessary, since selectedType might be upper case.
+    final bool isSelected = selectedType.toUpperCase() == type.toUpperCase();
+    final String serverTypeValue = type.toUpperCase(); // EXPENSE or INCOME
 
-    return InkWell(
-      onTap: () => onTypeChanged(type),
-      borderRadius: BorderRadius.circular(12),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
+    return Theme(
+      data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+      child: ChoiceChip(
+        label: Text(type),
+        selected: isSelected,
+        onSelected: (selected) {
+          if (selected) {
+            onTypeChanged(serverTypeValue);
+          }
+        },
+        backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+        selectedColor: color.withValues(alpha: 0.15),
+        labelStyle: TextStyle(
           color: isSelected
-              ? color.withValues(alpha: 0.15)
-              : Theme.of(context).cardColor,
+              ? color
+              : Theme.of(context).textTheme.bodyMedium?.color,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+        ),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? color : Colors.transparent,
-            width: 2,
+          side: BorderSide(
+            color: isSelected
+                ? color.withValues(alpha: 0.3)
+                : Theme.of(context).dividerColor.withValues(alpha: 0.1),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? color : Theme.of(context).hintColor,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? color : Theme.of(context).hintColor,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
+        showCheckmark: false,
       ),
     );
   }

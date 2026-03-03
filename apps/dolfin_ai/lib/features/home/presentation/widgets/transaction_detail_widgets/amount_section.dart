@@ -9,8 +9,8 @@ class AmountSection extends StatelessWidget {
   final double amount;
   final bool isIncome;
 
-  static const Color _incomeColor = Color(0xFF10b981);
-  static const Color _expenseColor = Color(0xFFef4444);
+  static const Color _incomeColor = Color(0xFF34d399); // Soft Emerald
+  static const Color _expenseColor = Color(0xFFf87171); // Soft Red
 
   const AmountSection({
     super.key,
