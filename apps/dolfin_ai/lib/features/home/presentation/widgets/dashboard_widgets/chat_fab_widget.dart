@@ -14,12 +14,10 @@ class ChatFabWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -35,21 +33,25 @@ class ChatFabWidget extends StatelessWidget {
               );
               onReturn?.call();
             },
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
             child: Container(
-              width: 60,
-              height: 60,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(20),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.white.withValues(alpha: 0.65),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  width: 1,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.15)
+                      : Colors.black.withValues(alpha: 0.06),
+                  width: 0.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: colorScheme.primary.withValues(alpha: 0.4),
-                    blurRadius: 16,
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                    blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
                 ],
@@ -57,8 +59,8 @@ class ChatFabWidget extends StatelessWidget {
               child: Center(
                 child: Image.asset(
                   'assets/icons/app_icon.png',
-                  width: 32,
-                  height: 32,
+                  width: 24,
+                  height: 24,
                 ),
               ),
             ),

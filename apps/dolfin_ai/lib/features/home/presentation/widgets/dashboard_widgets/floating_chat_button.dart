@@ -75,7 +75,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
         child: Container(
-          height: 56,
+          height: 48, // Reduced visual space
           padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
             color: isDark
@@ -141,17 +141,17 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: 44,
-        height: 44,
+        width: 36, // Reduced to take less visual space
+        height: 36, // Reduced to take less visual space
         decoration: BoxDecoration(
           color: isSelected
               ? colorScheme.primary.withValues(alpha: 0.15)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(
           icon,
-          size: 22,
+          size: 20, // Slightly smaller icon
           color: isSelected
               ? colorScheme.primary
               : isDark
