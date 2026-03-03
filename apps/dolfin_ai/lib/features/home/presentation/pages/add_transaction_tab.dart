@@ -430,7 +430,7 @@ class _AddTransactionTabState extends State<AddTransactionTab> {
 
               // Submit Button
               _buildSubmitButton(context),
-              SizedBox(height: 100)
+              SizedBox(height: 220)
             ],
           ),
         ),
