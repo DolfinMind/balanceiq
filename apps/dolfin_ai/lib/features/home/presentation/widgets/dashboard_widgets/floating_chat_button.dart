@@ -83,7 +83,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
             children: [
               _navIcon(
                 index: 0,
-                icon: LucideIcons.house,
+                icon: LucideIcons.layoutDashboard,
                 colorScheme: colorScheme,
                 isDark: isDark,
                 onTap: () => _onTapTab(0),
@@ -91,7 +91,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
               const SizedBox(width: 16),
               _navIcon(
                 index: 1,
-                icon: LucideIcons.chartLine,
+                icon: LucideIcons.chartPie,
                 colorScheme: colorScheme,
                 isDark: isDark,
                 onTap: () => _onTapTab(1),
@@ -99,7 +99,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
               const SizedBox(width: 16),
               _navIcon(
                 index: 2,
-                icon: LucideIcons.plus,
+                icon: LucideIcons.circlePlus,
                 colorScheme: colorScheme,
                 isDark: isDark,
                 onTap: () => _onTapTab(2),
