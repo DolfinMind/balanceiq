@@ -62,7 +62,8 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           decoration: BoxDecoration(
             color: isDark
                 ? Colors.white.withValues(alpha: 0.08)
-                : Colors.black.withValues(alpha: 0.75), // Darker in light mode
+                : Colors.black.withValues(
+                    alpha: 0.55), // Darker but more transparent in light mode
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: isDark
