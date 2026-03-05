@@ -15,7 +15,7 @@ import '../cubit/dashboard_cubit.dart';
 import '../cubit/transactions_cubit.dart';
 import '../widgets/calendar_widgets/date_selector_bottom_sheet.dart';
 import '../widgets/dashboard_layout.dart';
-import '../widgets/dashboard_widgets/floating_chat_button.dart';
+import '../widgets/dashboard_widgets/floating_bottom_bar.dart';
 import '../widgets/dashboard_widgets/chat_fab_widget.dart';
 import 'error_page.dart';
 import 'graphs_page.dart';

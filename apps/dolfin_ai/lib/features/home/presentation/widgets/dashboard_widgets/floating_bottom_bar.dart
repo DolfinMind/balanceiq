@@ -63,7 +63,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
             color: isDark
                 ? Colors.white.withValues(alpha: 0.08)
                 : Colors.black.withValues(
-                    alpha: 0.55), // Darker but more transparent in light mode
+                    alpha: 0.08),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: isDark

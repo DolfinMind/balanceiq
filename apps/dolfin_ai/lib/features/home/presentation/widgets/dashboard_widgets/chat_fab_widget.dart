@@ -40,14 +40,12 @@ class ChatFabWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(
-                        alpha:
-                            0.55), // Darker but more transparent in light mode
+                    : Colors.black.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.15)
-                      : Colors.white.withValues(alpha: 0.1),
+                      : Colors.black.withValues(alpha: 0.15),
                   width: 0.5,
                 ),
                 boxShadow: [
